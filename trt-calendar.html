@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Injection Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080a10;
+    --surface: #0e1118;
+    --surface2: #141720;
+    --surface3: #1a1e2a;
+    --border: rgba(200, 168, 85, 0.08);
+    --border-hover: rgba(200, 168, 85, 0.18);
+    --text: #e8e4dc;
+    --text-dim: rgba(232, 228, 220, 0.45);
+    --text-mid: rgba(232, 228, 220, 0.65);
+
+    --gold: #c8a855;
+    --gold-dim: rgba(200, 168, 85, 0.15);
+    --gold-glow: rgba(200, 168, 85, 0.25);
+
+    --inj: #c8a855;
+    --inj-bg: rgba(200, 168, 85, 0.1);
+    --inj-check: rgba(200, 168, 85, 0.9);
+
+    --anc1: #5cc9d4;
+    --anc1-bg: rgba(92, 201, 212, 0.1);
+    --anc1-check: rgba(92, 201, 212, 0.9);
+
+    --anc2: #d4748a;
+    --anc2-bg: rgba(212, 116, 138, 0.1);
+    --anc2-check: rgba(212, 116, 138, 0.9);
+
+    --anc3: #8cc463;
+    --anc3-bg: rgba(140, 196, 99, 0.1);
+    --anc3-check: rgba(140, 196, 99, 0.9);
+
+    --anc4: #b07cd8;
+    --anc4-bg: rgba(176, 124, 216, 0.1);
+    --anc4-check: rgba(176, 124, 216, 0.9);
+
+    --today-ring: rgba(200, 168, 85, 0.35);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* =========== NOISE =========== */
+  .noise {
+    position: fixed; inset: 0; z-index: 999; pointer-events: none; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+  }
+
+  /* =========== LAYOUT =========== */
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.7s ease 0.15s forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* =========== HEADER =========== */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .header__brand {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 8px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .header__sub {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* =========== MONTH NAV =========== */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .month-nav__title {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: 2px;
+    color: var(--text);
+    min-width: 240px;
+    text-align: center;
+  }
+
+  .month-nav__btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .month-nav__btn:hover {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  .month-nav__btn svg { width: 14px; height: 14px; }
+
+  /* =========== LEGEND =========== */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .legend__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+  }
+
+  .legend__dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+  }
+
+  .legend__dot--inj { background: var(--inj); }
+  .legend__dot--anc1 { background: var(--anc1); }
+  .legend__dot--anc2 { background: var(--anc2); }
+  .legend__dot--anc3 { background: var(--anc3); }
+  .legend__dot--anc4 { background: var(--anc4); }
+
+  /* =========== CALENDAR GRID =========== */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cal-grid__day-label {
+    background: var(--surface2);
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* =========== DAY CELL =========== */
+  .day {
+    background: var(--surface);
+    min-height: 110px;
+    padding: 10px;
+    position: relative;
+    transition: background 0.25s ease;
+    cursor: pointer;
+  }
+
+  .day:hover { background: var(--surface2); }
+  .day--empty { cursor: default; background: var(--bg); }
+  .day--empty:hover { background: var(--bg); }
+
+  .day--today {
+    box-shadow: inset 0 0 0 1px var(--today-ring);
+  }
+
+  .day__number {
+    font-family: 'Cormorant', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-mid);
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .day--today .day__number { color: var(--gold); font-weight: 600; }
+
+  /* =========== CHECKBOXES =========== */
+  .day__checks {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .check {
+    width: 18px; height: 18px;
+    border-radius: 3px;
+    border: 1.5px solid;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .check:hover { transform: scale(1.15); }
+
+  .check--inj { border-color: rgba(200, 168, 85, 0.35); background: var(--inj-bg); }
+  .check--anc1 { border-color: rgba(92, 201, 212, 0.35); background: var(--anc1-bg); }
+  .check--anc2 { border-color: rgba(212, 116, 138, 0.35); background: var(--anc2-bg); }
+  .check--anc3 { border-color: rgba(140, 196, 99, 0.35); background: var(--anc3-bg); }
+  .check--anc4 { border-color: rgba(176, 124, 216, 0.35); background: var(--anc4-bg); }
+
+  .check.checked--inj { background: var(--inj-check); border-color: var(--inj); }
+  .check.checked--anc1 { background: var(--anc1-check); border-color: var(--anc1); }
+  .check.checked--anc2 { background: var(--anc2-check); border-color: var(--anc2); }
+  .check.checked--anc3 { background: var(--anc3-check); border-color: var(--anc3); }
+  .check.checked--anc4 { background: var(--anc4-check); border-color: var(--anc4); }
+
+  .check.checked--inj::after,
+  .check.checked--anc1::after,
+  .check.checked--anc2::after,
+  .check.checked--anc3::after,
+  .check.checked--anc4::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 2px;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  /* =========== NOTE INDICATOR =========== */
+  .day__note-dot {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .day__note-dot.visible { opacity: 0.7; }
+
+  /* =========== NOTE PANEL (SLIDE OUT) =========== */
+  .note-panel {
+    position: fixed;
+    top: 0; right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: var(--surface2);
+    border-left: 1px solid var(--border);
+    z-index: 100;
+    transition: right 0.45s cubic-bezier(0.25, 0.9, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.4);
+  }
+
+  .note-panel.open { right: 0; }
+
+  .note-panel__header {
+    padding: 32px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .note-panel__date {
+    font-family: 'Cormorant', serif;
+    font-size: 26px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .note-panel__date span {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .note-panel__close {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all 0.25s ease;
+  }
+
+  .note-panel__close:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Panel checkboxes (larger) */
+  .note-panel__checks {
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .note-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .note-check__box {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    border: 1.5px solid;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .note-check__box:hover { transform: scale(1.1); }
+
+  .note-check__box--inj { border-color: rgba(200, 168, 85, 0.4); background: var(--inj-bg); }
+  .note-check__box--anc1 { border-color: rgba(92, 201, 212, 0.4); background: var(--anc1-bg); }
+  .note-check__box--anc2 { border-color: rgba(212, 116, 138, 0.4); background: var(--anc2-bg); }
+  .note-check__box--anc3 { border-color: rgba(140, 196, 99, 0.4); background: var(--anc3-bg); }
+  .note-check__box--anc4 { border-color: rgba(176, 124, 216, 0.4); background: var(--anc4-bg); }
+
+  .note-check__box.checked--inj { background: var(--inj-check); border-color: var(--inj); }
+  .note-check__box.checked--anc1 { background: var(--anc1-check); border-color: var(--anc1); }
+  .note-check__box.checked--anc2 { background: var(--anc2-check); border-color: var(--anc2); }
+  .note-check__box.checked--anc3 { background: var(--anc3-check); border-color: var(--anc3); }
+  .note-check__box.checked--anc4 { background: var(--anc4-check); border-color: var(--anc4); }
+
+  .note-check__box.checked--inj::after,
+  .note-check__box.checked--anc1::after,
+  .note-check__box.checked--anc2::after,
+  .note-check__box.checked--anc3::after,
+  .note-check__box.checked--anc4::after {
+    content: '';
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .note-check__label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+  }
+
+  /* Note textarea */
+  .note-panel__body {
+    flex: 1;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-panel__body label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .note-panel__textarea {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .note-panel__textarea::placeholder { color: var(--text-dim); }
+  .note-panel__textarea:focus { border-color: var(--gold-glow); }
+
+  .note-panel__save {
+    margin-top: 16px;
+    padding: 12px 24px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(200, 168, 85, 0.25);
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    align-self: flex-end;
+  }
+
+  .note-panel__save:hover {
+    background: rgba(200, 168, 85, 0.2);
+    border-color: var(--gold);
+  }
+
+  /* =========== OVERLAY =========== */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  /* =========== STATS BAR =========== */
+  .stats {
+    display: flex;
+    gap: 1px;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .stat {
+    flex: 1;
+    background: var(--surface);
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .stat__value {
+    font-family: 'Cormorant', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat__value--inj { color: var(--inj); }
+  .stat__value--anc1 { color: var(--anc1); }
+  .stat__value--anc2 { color: var(--anc2); }
+  .stat__value--anc3 { color: var(--anc3); }
+  .stat__value--anc4 { color: var(--anc4); }
+
+  .stat__label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* =========== RESPONSIVE =========== */
+  @media (max-width: 700px) {
+    .app { padding: 20px 12px 40px; }
+    .day { min-height: 80px; padding: 6px; }
+    .day__number { font-size: 14px; margin-bottom: 4px; }
+    .check { width: 14px; height: 14px; }
+    .check.checked--inj::after,
+    .check.checked--anc1::after,
+    .check.checked--anc2::after,
+    .check.checked--anc3::after,
+    .check.checked--anc4::after {
+      left: 3px; top: 1px; width: 4px; height: 7px;
+    }
+    .legend { gap: 14px; }
+    .legend__item { font-size: 9px; }
+    .note-panel { width: 100vw; right: -110vw; }
+    .stats { flex-wrap: wrap; }
+    .stat { flex: 1 1 45%; }
+    .month-nav__title { font-size: 1.3rem; min-width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="header__brand">Revive</div>
+      <div class="header__sub">Injection Tracker</div>
+    </div>
+  </div>
+
+  <!-- Month nav -->
+  <div class="month-nav">
+    <button class="month-nav__btn" id="prevMonth">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2L4 7l5 5"/></svg>
+    </button>
+    <div class="month-nav__title" id="monthTitle"></div>
+    <button class="month-nav__btn" id="nextMonth">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l5 5-5 5"/></svg>
+    </button>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend__item"><div class="legend__dot legend__dot--inj"></div>Injection</div>
+    <div class="legend__item"><div class="legend__dot legend__dot--anc1"></div>HCG</div>
+    <div class="legend__item"><div class="legend__dot legend__dot--anc2"></div>Anastrozole</div>
+    <div class="legend__item"><div class="legend__dot legend__dot--anc3"></div>B12</div>
+    <div class="legend__item"><div class="legend__dot legend__dot--anc4"></div>Retatrutide</div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="cal-grid" id="calGrid"></div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Note panel -->
+<div class="note-panel" id="notePanel">
+  <div class="note-panel__header">
+    <div class="note-panel__date" id="panelDate"></div>
+    <button class="note-panel__close" id="panelClose">&times;</button>
+  </div>
+  <div class="note-panel__checks" id="panelChecks"></div>
+  <div class="note-panel__body">
+    <label>Notes</label>
+    <textarea class="note-panel__textarea" id="panelNote" placeholder="Side effects, dosage, site, bloods due..."></textarea>
+    <button class="note-panel__save" id="panelSave">Save</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const TYPES = [
+    { key: 'inj', label: 'Injection (TRT/HRT)' },
+    { key: 'anc1', label: 'HCG' },
+    { key: 'anc2', label: 'Anastrozole' },
+    { key: 'anc3', label: 'B12' },
+    { key: 'anc4', label: 'Retatrutide' },
+  ];
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  let currentYear, currentMonth;
+  const today = new Date();
+
+  // Data store (localStorage)
+  function storeKey(y, m) { return `revive_${y}_${m}`; }
+
+  function loadMonth(y, m) {
+    try { return JSON.parse(localStorage.getItem(storeKey(y, m))) || {}; }
+    catch { return {}; }
+  }
+
+  function saveMonth(y, m, data) {
+    localStorage.setItem(storeKey(y, m), JSON.stringify(data));
+  }
+
+  function getDayData(y, m, d) {
+    const data = loadMonth(y, m);
+    return data[d] || { checks: {}, note: '' };
+  }
+
+  function setDayData(y, m, d, dayData) {
+    const data = loadMonth(y, m);
+    data[d] = dayData;
+    saveMonth(y, m, data);
+  }
+
+  // Render calendar
+  function render() {
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    document.getElementById('monthTitle').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+
+    // Day labels
+    DAYS.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-grid__day-label';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const offset = (firstDay === 0 ? 6 : firstDay - 1); // Monday start
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const monthData = loadMonth(currentYear, currentMonth);
+
+    // Empty cells
+    for (let i = 0; i < offset; i++) {
+      const el = document.createElement('div');
+      el.className = 'day day--empty';
+      grid.appendChild(el);
+    }
+
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const el = document.createElement('div');
+      el.className = 'day';
+
+      const isToday = d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+      if (isToday) el.classList.add('day--today');
+
+      const dayData = monthData[d] || { checks: {}, note: '' };
+
+      // Number
+      const num = document.createElement('div');
+      num.className = 'day__number';
+      num.textContent = d;
+      el.appendChild(num);
+
+      // Checkboxes
+      const checksDiv = document.createElement('div');
+      checksDiv.className = 'day__checks';
+
+      TYPES.forEach(t => {
+        const box = document.createElement('div');
+        box.className = `check check--${t.key}`;
+        if (dayData.checks[t.key]) box.classList.add(`checked--${t.key}`);
+
+        box.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dd = getDayData(currentYear, currentMonth, d);
+          if (!dd.checks) dd.checks = {};
+          dd.checks[t.key] = !dd.checks[t.key];
+          setDayData(currentYear, currentMonth, d, dd);
+          render();
+        });
+
+        checksDiv.appendChild(box);
+      });
+
+      el.appendChild(checksDiv);
+
+      // Note dot
+      const noteDot = document.createElement('div');
+      noteDot.className = 'day__note-dot';
+      if (dayData.note && dayData.note.trim()) noteDot.classList.add('visible');
+      el.appendChild(noteDot);
+
+      // Click to open panel
+      el.addEventListener('click', () => openPanel(d));
+
+      grid.appendChild(el);
+    }
+
+    renderStats(monthData, daysInMonth);
+  }
+
+  // Stats
+  function renderStats(monthData, daysInMonth) {
+    const counts = { inj: 0, anc1: 0, anc2: 0, anc3: 0 };
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dd = monthData[d];
+      if (!dd || !dd.checks) continue;
+      TYPES.forEach(t => { if (dd.checks[t.key]) counts[t.key]++; });
+    }
+
+    const statsEl = document.getElementById('stats');
+    statsEl.innerHTML = TYPES.map(t => `
+      <div class="stat">
+        <div class="stat__value stat__value--${t.key}">${counts[t.key]}</div>
+        <div class="stat__label">${t.label.split(' ')[0]}</div>
+      </div>
+    `).join('');
+  }
+
+  // Note panel
+  let panelDay = null;
+
+  function openPanel(d) {
+    panelDay = d;
+    const dd = getDayData(currentYear, currentMonth, d);
+    const dateObj = new Date(currentYear, currentMonth, d);
+    const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'long' });
+
+    document.getElementById('panelDate').innerHTML =
+      `${d} ${MONTHS[currentMonth]}<span>${dayName} ${currentYear}</span>`;
+
+    // Render panel checkboxes
+    const checksEl = document.getElementById('panelChecks');
+    checksEl.innerHTML = '';
+    TYPES.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'note-check';
+
+      const box = document.createElement('div');
+      box.className = `note-check__box note-check__box--${t.key}`;
+      if (dd.checks && dd.checks[t.key]) box.classList.add(`checked--${t.key}`);
+
+      box.addEventListener('click', () => {
+        const fresh = getDayData(currentYear, currentMonth, d);
+        if (!fresh.checks) fresh.checks = {};
+        fresh.checks[t.key] = !fresh.checks[t.key];
+        setDayData(currentYear, currentMonth, d, fresh);
+        box.classList.toggle(`checked--${t.key}`);
+        render();
+      });
+
+      const label = document.createElement('div');
+      label.className = 'note-check__label';
+      label.textContent = t.label;
+
+      row.appendChild(box);
+      row.appendChild(label);
+      checksEl.appendChild(row);
+    });
+
+    document.getElementById('panelNote').value = dd.note || '';
+
+    document.getElementById('notePanel').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function closePanel() {
+    document.getElementById('notePanel').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+    panelDay = null;
+  }
+
+  document.getElementById('panelClose').addEventListener('click', closePanel);
+  document.getElementById('overlay').addEventListener('click', closePanel);
+
+  document.getElementById('panelSave').addEventListener('click', () => {
+    if (panelDay === null) return;
+    const dd = getDayData(currentYear, currentMonth, panelDay);
+    dd.note = document.getElementById('panelNote').value;
+    setDayData(currentYear, currentMonth, panelDay, dd);
+    render();
+    closePanel();
+  });
+
+  // Month navigation
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    render();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    render();
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePanel();
+  });
+
+  // Init — default to April 2026
+  currentYear = 2026;
+  currentMonth = 3; // April (0-indexed)
+  render();
+})();
+</script>
+</body>
+</html>
