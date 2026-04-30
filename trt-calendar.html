@@ -734,7 +734,8 @@
 
   // Stats
   function renderStats(monthData, daysInMonth) {
-    const counts = { inj: 0, anc1: 0, anc2: 0, anc3: 0 };
+    const counts = {};
+    TYPES.forEach(t => { counts[t.key] = 0; });
     for (let d = 1; d <= daysInMonth; d++) {
       const dd = monthData[d];
       if (!dd || !dd.checks) continue;
