@@ -627,10 +627,17 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
         Dashboard
       </a>
-      <a href="assessment.html">
+      <a href="#" onclick="toggleAssessment(event)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h8M2 13h6"/></svg>
         My Assessment
+        <svg id="assessCaret" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-left:auto;width:10px;height:10px;transition:transform 0.2s;"><path d="M2 3l3 3 3-3"/></svg>
       </a>
+      <div id="assessSub" style="display:none;flex-direction:column;">
+        <a href="assessment.html" style="padding-left:36px;font-size:0.65rem;opacity:0.7;">Retake Assessment</a>
+        <a href="#" style="padding-left:36px;font-size:0.65rem;opacity:0.7;" onclick="selectPlan('Foundation')">Foundation — £149/mo</a>
+        <a href="#" style="padding-left:36px;font-size:0.65rem;opacity:0.7;" onclick="selectPlan('Performance')">Performance — £289/mo</a>
+        <a href="#" style="padding-left:36px;font-size:0.65rem;opacity:0.7;" onclick="selectPlan('Executive')">Executive — £549/mo</a>
+      </div>
       <a href="#">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 1"/></svg>
         My Protocol
@@ -666,9 +673,9 @@
     </nav>
 
     <div class="sidebar-user">
-      <div class="user-name">James M.</div>
-      <div class="user-plan">Performance Plan</div>
-      <span class="user-plan-badge">Active · Month 3</span>
+      <div class="user-name" id="patientGreeting">—</div>
+      <div class="user-plan" id="patientPlan">Patient</div>
+      <span class="user-plan-badge" id="patientEmail"></span>
     </div>
   </aside>
 
@@ -941,7 +948,54 @@
   </main>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain: "revive-clinic-885e7.firebaseapp.com",
+    projectId: "revive-clinic-885e7",
+    storageBucket: "revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId: "1075531492371",
+    appId: "1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const _app = initializeApp(firebaseConfig);
+  const _auth = getAuth(_app);
+  const _db   = getFirestore(_app);
+
+  // Auth gate — redirect to login if not signed in
+  onAuthStateChanged(_auth, async user => {
+    if (!user) return window.location.href = 'login.html';
+
+    // Load patient name
+    const nameEl = document.getElementById('patientGreeting');
+    const planEl = document.getElementById('patientPlan');
+    const emailEl = document.getElementById('patientEmail');
+
+    if (nameEl) {
+      const firstName = (user.displayName || user.email).split(' ')[0];
+      nameEl.textContent = firstName;
+    }
+    if (emailEl) emailEl.textContent = user.email;
+
+    // Load patient data from Firestore
+    try {
+      const snap = await getDoc(doc(_db, 'patients', user.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        if (planEl && data.plan) planEl.textContent = data.plan + ' Plan';
+      }
+    } catch(e) {}
+  });
+
+  window._handleSignOut = async function() {
+    await signOut(_auth);
+    window.location.href = 'login.html';
+  };
+
   // ── BIOMARKER RING GAUGES ──
   // UK NHS / BSSM clinical reference ranges
   // status: good=within range, warn=borderline, low=outside range (red)
@@ -1036,6 +1090,20 @@
     btn.textContent = '✓ Saved';
     btn.style.borderColor = 'var(--copper)';
     btn.style.color = 'var(--copper)';
+  }
+
+  function toggleAssessment(e) {
+    e.preventDefault();
+    const sub   = document.getElementById('assessSub');
+    const caret = document.getElementById('assessCaret');
+    const open  = sub.style.display === 'flex';
+    sub.style.display   = open ? 'none' : 'flex';
+    caret.style.transform = open ? '' : 'rotate(180deg)';
+  }
+
+  function selectPlan(plan) {
+    // Placeholder — will wire to Stripe checkout
+    alert('Stripe checkout for ' + plan + ' plan coming soon.');
   }
 </script>
 
