@@ -244,7 +244,7 @@
 
   /* ── BIOMARKER RING TILES ── */
   .biomarker {
-    background: rgba(17,29,43,0.8);
+    background: rgba(17,29,43,0.85);
     border: 1px solid var(--line);
     border-radius: 2px;
     padding: 20px 16px 16px;
@@ -254,33 +254,32 @@
     gap: 10px;
     position: relative;
   }
-
   .bm-ring-wrap {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     flex-shrink: 0;
   }
   .bm-ring-wrap svg {
-    width: 100%;
-    height: 100%;
+    width: 110px;
+    height: 110px;
+    display: block;
     transform: rotate(-90deg);
   }
   .bm-ring-track {
     fill: none;
-    stroke: rgba(184,115,51,0.12);
-    stroke-width: 6;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 8;
   }
   .bm-ring-fill {
     fill: none;
-    stroke-width: 6;
+    stroke-width: 8;
     stroke-linecap: round;
-    transition: stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1);
+    transition: stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1);
   }
-  .bm-ring-fill.good { stroke: #4a9a5a; }
+  .bm-ring-fill.good { stroke: #3cb371; }
   .bm-ring-fill.warn { stroke: #c4883a; }
-  .bm-ring-fill.low  { stroke: #c45a3a; }
-
+  .bm-ring-fill.low  { stroke: #e03535; }
   .bm-ring-inner {
     position: absolute;
     inset: 0;
@@ -289,23 +288,22 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    gap: 1px;
   }
-  .bm-value { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 300; color: var(--cream); line-height: 1; }
-  .bm-unit  { font-size: 0.5rem; color: var(--dim); letter-spacing: 0.05em; }
-
-  .bm-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); text-align: center; }
-  .bm-range { font-size: 0.55rem; color: rgba(251,243,218,0.3); text-align: center; }
+  .bm-value { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: var(--cream); line-height: 1; }
+  .bm-unit  { font-size: 0.48rem; color: var(--dim); letter-spacing: 0.05em; margin-top: 2px; }
+  .bm-label { font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); text-align: center; line-height: 1.4; }
+  .bm-range { font-size: 0.5rem; color: rgba(251,243,218,0.28); text-align: center; }
   .bm-status {
-    font-size: 0.5rem;
+    font-size: 0.48rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 2px 8px;
     border-radius: 1px;
+    font-weight: 600;
   }
-  .bm-status.good { background: rgba(74,154,90,0.15); color: #6ec27e; }
-  .bm-status.warn { background: rgba(196,136,58,0.15); color: #e8a855; }
-  .bm-status.low  { background: rgba(196,90,58,0.15); color: #e87055; }
+  .bm-status.good { background: rgba(60,179,113,0.15); color: #3cb371; border: 1px solid rgba(60,179,113,0.3); }
+  .bm-status.warn { background: rgba(196,136,58,0.15); color: #e8a855; border: 1px solid rgba(196,136,58,0.3); }
+  .bm-status.low  { background: rgba(224,53,53,0.15);  color: #e05555; border: 1px solid rgba(224,53,53,0.3); }
 
   /* ── INJECTION TRACKER ── */
   .injection-card {
@@ -945,62 +943,75 @@
 
 <script>
   // ── BIOMARKER RING GAUGES ──
-  // value: actual reading, min/max: reference range, status: good/warn/low
+  // UK NHS / BSSM clinical reference ranges
+  // status: good=within range, warn=borderline, low=outside range (red)
   const biomarkers = [
-    { label:'Total Testosterone', value:28.4, display:'28.4', unit:'nmol/L', range:'8.6–29.0', min:8.6,  max:32,   status:'good', statusText:'Optimal' },
-    { label:'Free Testosterone',  value:485,  display:'485',  unit:'pmol/L', range:'170–670', min:0,    max:670,  status:'good', statusText:'Optimal' },
-    { label:'Estradiol (E2)',      value:142,  display:'142',  unit:'pmol/L', range:'90–160',  min:0,    max:200,  status:'warn', statusText:'Monitor' },
-    { label:'Haematocrit',        value:46.2, display:'46.2', unit:'%',      range:'38–52',   min:30,   max:60,   status:'good', statusText:'Normal'  },
-    { label:'SHBG',               value:22,   display:'22',   unit:'nmol/L', range:'17–55',   min:0,    max:60,   status:'good', statusText:'Good'    },
-    { label:'PSA',                value:0.8,  display:'0.8',  unit:'ng/mL',  range:'<4.0',    min:0,    max:5,    status:'good', statusText:'Normal'  },
-    { label:'LH',                 value:0.4,  display:'0.4',  unit:'IU/L',   range:'Suppressed',min:0,  max:2,    status:'warn', statusText:'On TRT'  },
-    { label:'Vitamin D',          value:74,   display:'74',   unit:'nmol/L', range:'>75',     min:0,    max:120,  status:'warn', statusText:'Low-Normal'},
+    { label:'Total Testosterone', value:28.4, display:'28.4', unit:'nmol/L', range:'8.6–29.0',    refLo:8.6,  refHi:29.0, min:0, max:35,  status:'good', statusText:'Optimal'   },
+    { label:'Free Testosterone',  value:485,  display:'485',  unit:'pmol/L', range:'170–670',     refLo:170,  refHi:670,  min:0, max:800, status:'good', statusText:'Optimal'   },
+    { label:'Estradiol (E2)',      value:142,  display:'142',  unit:'pmol/L', range:'90–160',      refLo:90,   refHi:160,  min:0, max:220, status:'warn', statusText:'Monitor'   },
+    { label:'Haematocrit',        value:46.2, display:'46.2', unit:'%',      range:'38–52%',      refLo:38,   refHi:52,   min:30, max:60, status:'good', statusText:'Normal'    },
+    { label:'SHBG',               value:22,   display:'22',   unit:'nmol/L', range:'17–55',       refLo:17,   refHi:55,   min:0, max:70,  status:'good', statusText:'Good'      },
+    { label:'PSA',                value:0.8,  display:'0.8',  unit:'ng/mL',  range:'<4.0',        refLo:0,    refHi:4.0,  min:0, max:6,   status:'good', statusText:'Normal'    },
+    { label:'LH',                 value:0.4,  display:'0.4',  unit:'IU/L',   range:'Suppressed',  refLo:0,    refHi:1.5,  min:0, max:3,   status:'warn', statusText:'On TRT'    },
+    { label:'Vitamin D',          value:74,   display:'74',   unit:'nmol/L', range:'>75 target',  refLo:75,   refHi:200,  min:0, max:200, status:'warn', statusText:'Low-Normal'},
   ];
 
-  const R = 42; // ring radius
-  const CIRC = 2 * Math.PI * R; // circumference
+  // Compute status from UK ranges
+  biomarkers.forEach(bm => {
+    if (bm.value < bm.refLo || bm.value > bm.refHi) {
+      bm.status = 'low'; // red — outside UK limits
+    } else if (bm.value < bm.refLo * 1.05 || bm.value > bm.refHi * 0.95) {
+      bm.status = 'warn'; // amber — borderline
+    } else {
+      bm.status = 'good';
+    }
+    // Special overrides
+    if (bm.label === 'LH') bm.status = 'warn'; // expected suppressed on TRT
+    if (bm.label === 'Vitamin D') bm.status = bm.value < 75 ? 'low' : 'good';
+  });
+
+  const R    = 44;
+  const CIRC = 2 * Math.PI * R;
 
   function makeBiomarkerTile(bm) {
-    // pct of range filled (0–1), clamped
-    const pct = Math.min(Math.max((bm.value - bm.min) / (bm.max - bm.min), 0), 1);
+    const pct       = Math.min(Math.max((bm.value - bm.min) / (bm.max - bm.min), 0), 1);
     const dashFill   = pct * CIRC;
     const dashOffset = CIRC - dashFill;
 
     const div = document.createElement('div');
     div.className = 'biomarker';
-    div.innerHTML = `
-      <div class="bm-ring-wrap">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <circle class="bm-ring-track" cx="50" cy="50" r="${R}"
-            stroke-dasharray="${CIRC}" stroke-dashoffset="0"/>
-          <circle class="bm-ring-fill ${bm.status}" cx="50" cy="50" r="${R}"
-            stroke-dasharray="${CIRC}"
-            stroke-dashoffset="${CIRC}"
-            data-target="${dashOffset}"/>
-        </svg>
-        <div class="bm-ring-inner">
-          <div class="bm-value">${bm.display}</div>
-          <div class="bm-unit">${bm.unit}</div>
-        </div>
-      </div>
-      <div class="bm-label">${bm.label}</div>
-      <div class="bm-range">${bm.range}</div>
-      <span class="bm-status ${bm.status}">${bm.statusText}</span>
-    `;
+
+    div.innerHTML =
+      '<div class="bm-ring-wrap">' +
+        '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+          '<circle class="bm-ring-track" cx="50" cy="50" r="' + R + '" ' +
+            'stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="0"/>' +
+          '<circle class="bm-ring-fill ' + bm.status + '" cx="50" cy="50" r="' + R + '" ' +
+            'stroke-dasharray="' + CIRC.toFixed(2) + '" ' +
+            'stroke-dashoffset="' + CIRC.toFixed(2) + '" ' +
+            'data-target="' + dashOffset.toFixed(2) + '"/>' +
+        '</svg>' +
+        '<div class="bm-ring-inner">' +
+          '<div class="bm-value">' + bm.display + '</div>' +
+          '<div class="bm-unit">' + bm.unit + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="bm-label">' + bm.label + '</div>' +
+      '<div class="bm-range">' + bm.range + '</div>' +
+      '<span class="bm-status ' + bm.status + '">' + bm.statusText + '</span>';
+
     return div;
   }
 
   const grid = document.getElementById('biomarker-grid');
   biomarkers.forEach(bm => grid.appendChild(makeBiomarkerTile(bm)));
 
-  // Animate rings in after paint
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      document.querySelectorAll('.bm-ring-fill').forEach(el => {
-        el.style.strokeDashoffset = el.dataset.target;
-      });
-    }, 150);
-  });
+  // Animate rings after DOM settles
+  setTimeout(function() {
+    document.querySelectorAll('.bm-ring-fill').forEach(function(el) {
+      el.style.strokeDashoffset = el.dataset.target;
+    });
+  }, 200);
 
   // Date
   const d = new Date();
