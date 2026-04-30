@@ -1167,7 +1167,7 @@
       <div class="cta-title">Ready to reclaim your vitality?</div>
       <p class="cta-sub">Your results suggest you may benefit from a supervised hormone optimisation programme. Book a consultation with one of our clinicians — your first blood panel is included.</p>
       <div class="cta-price">From £149 <small>/ month</small></div>
-      <button class="btn-cta" onclick="window.location.href='dashboard.html'">Create My Account →</button>
+      <button class="btn-cta" onclick="saveAndSignup()">Create My Account →</button>
     </div>
   </div>
 
@@ -1413,6 +1413,24 @@
     const uniqueTests = [...new Set(tests)];
     const tc = document.getElementById('tests-container');
     tc.innerHTML = uniqueTests.map(t => `<div class="test-item">${t}</div>`).join('');
+  }
+
+  function saveAndSignup() {
+    // Collect assessment state for storage
+    const results = {
+      path: currentPath,
+      answers: answers,
+      findings: Array.from(document.querySelectorAll('.result-card')).map(c => ({
+        tag:   c.querySelector('.result-tag')   ? c.querySelector('.result-tag').textContent   : '',
+        title: c.querySelector('.result-title') ? c.querySelector('.result-title').textContent : '',
+        body:  c.querySelector('.result-body')  ? c.querySelector('.result-body').textContent  : '',
+        severity: c.querySelector('.bm-status') ? c.querySelector('.bm-status').textContent   : '',
+      })),
+      tests: Array.from(document.querySelectorAll('.test-item')).map(t => t.textContent.trim()),
+      completedAt: new Date().toISOString(),
+    };
+    sessionStorage.setItem('revive_assessment', JSON.stringify(results));
+    window.location.href = 'signup.html';
   }
 </script>
 
