@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Patient Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #111d2b;
+    --navy2:   #162030;
+    --navy3:   #1c2a3a;
+    --cream:   #fbf3da;
+    --copper:  #b87333;
+    --tan:     #bd9468;
+    --dim:     rgba(251,243,218,0.45);
+    --line:    rgba(184,115,51,0.2);
+    --sidebar: 240px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Didact Gothic', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ════════════════════════════════
+     LAYOUT
+  ════════════════════════════════ */
+  .shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  aside {
+    width: var(--sidebar);
+    min-height: 100vh;
+    background: #0d1822;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 50;
+    padding: 0 0 32px;
+  }
+
+  .sidebar-brand {
+    padding: 28px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sidebar-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--copper);
+    text-transform: uppercase;
+    text-decoration: none;
+    display: block;
+  }
+  .sidebar-tagline {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .sidebar-section {
+    font-size: 0.5rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--copper);
+    padding: 20px 24px 8px;
+    opacity: 0.7;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    font-size: 0.72rem;
+    color: var(--dim);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+    position: relative;
+  }
+  nav a:hover { color: var(--cream); background: rgba(184,115,51,0.06); }
+  nav a.active {
+    color: var(--cream);
+    background: rgba(184,115,51,0.1);
+  }
+  nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--copper);
+  }
+  nav a svg { width: 14px; height: 14px; opacity: 0.7; flex-shrink: 0; }
+
+  .sidebar-user {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid var(--line);
+  }
+  .user-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--cream);
+    margin-bottom: 2px;
+  }
+  .user-plan {
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+  .user-plan-badge {
+    display: inline-block;
+    background: rgba(184,115,51,0.12);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 2px 8px;
+    margin-top: 4px;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--tan);
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    margin-left: var(--sidebar);
+    flex: 1;
+    padding: 40px 40px 80px;
+    max-width: calc(100vw - var(--sidebar));
+  }
+
+  .page-head {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .page-eyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+  .page-title em { font-style: italic; color: var(--tan); }
+
+  .date-tag {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+  }
+
+  /* ── GRID SYSTEM ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .col-span-2 { grid-column: span 2; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .dashboard-section { margin-bottom: 36px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(22,32,48,0.7);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 24px;
+  }
+  .card-sm { padding: 18px 20px; }
+  .card-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .card-body {
+    font-size: 0.72rem;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  /* ── BIOMARKER RING TILES ── */
+  .biomarker {
+    background: rgba(17,29,43,0.8);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 20px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .bm-ring-wrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+  .bm-ring-wrap svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .bm-ring-track {
+    fill: none;
+    stroke: rgba(184,115,51,0.12);
+    stroke-width: 6;
+  }
+  .bm-ring-fill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1);
+  }
+  .bm-ring-fill.good { stroke: #4a9a5a; }
+  .bm-ring-fill.warn { stroke: #c4883a; }
+  .bm-ring-fill.low  { stroke: #c45a3a; }
+
+  .bm-ring-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1px;
+  }
+  .bm-value { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 300; color: var(--cream); line-height: 1; }
+  .bm-unit  { font-size: 0.5rem; color: var(--dim); letter-spacing: 0.05em; }
+
+  .bm-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); text-align: center; }
+  .bm-range { font-size: 0.55rem; color: rgba(251,243,218,0.3); text-align: center; }
+  .bm-status {
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 1px;
+  }
+  .bm-status.good { background: rgba(74,154,90,0.15); color: #6ec27e; }
+  .bm-status.warn { background: rgba(196,136,58,0.15); color: #e8a855; }
+  .bm-status.low  { background: rgba(196,90,58,0.15); color: #e87055; }
+
+  /* ── INJECTION TRACKER ── */
+  .injection-card {
+    background: linear-gradient(135deg, rgba(184,115,51,0.12), rgba(184,115,51,0.04));
+    border: 1px solid rgba(184,115,51,0.35);
+    border-radius: 2px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .inj-countdown {
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .inj-days {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--copper);
+    line-height: 1;
+  }
+  .inj-days-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .inj-divider {
+    width: 1px;
+    height: 60px;
+    background: var(--line);
+    flex-shrink: 0;
+  }
+  .inj-info { flex: 1; }
+  .inj-drug { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--cream); margin-bottom: 4px; }
+  .inj-dose { font-size: 0.7rem; color: var(--dim); }
+  .inj-btn {
+    padding: 10px 20px;
+    background: var(--copper);
+    border: none;
+    color: var(--navy);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 1px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .inj-btn:hover { background: var(--tan); }
+
+  /* ── PROTOCOL PILLS ── */
+  .protocol-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .protocol-item {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+  }
+  .pi-name { font-size: 0.7rem; color: var(--cream); }
+  .pi-dose { font-size: 0.6rem; color: var(--dim); }
+  .pi-freq {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--copper);
+    text-transform: uppercase;
+  }
+
+  /* ── CHART ── */
+  .chart-wrap {
+    height: 130px;
+    position: relative;
+    margin-top: 12px;
+  }
+  .chart-wrap svg { width: 100%; height: 100%; }
+  .chart-grid line { stroke: rgba(184,115,51,0.08); stroke-width: 1; }
+  .chart-line { fill: none; stroke: var(--copper); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-fill { fill: url(#chartGrad); stroke: none; }
+  .chart-dot { fill: var(--copper); }
+
+  /* ── CLINICIAN CARD ── */
+  .clinician-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .clinician-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--copper), var(--tan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+  .clinician-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--cream); margin-bottom: 2px; }
+  .clinician-role { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--dim); }
+  .msg-input-row { display: flex; gap: 10px; margin-top: 16px; }
+  .msg-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 10px 14px;
+    color: var(--cream);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.72rem;
+    outline: none;
+  }
+  .msg-input::placeholder { color: var(--dim); }
+  .msg-input:focus { border-color: var(--copper); }
+  .msg-send {
+    padding: 10px 18px;
+    background: var(--copper);
+    border: none;
+    color: var(--navy);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 1px;
+  }
+
+  /* ── CHECKIN ── */
+  .checkin-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .checkin-item { text-align: center; }
+  .checkin-label { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+  .checkin-scale { display: flex; justify-content: center; gap: 4px; }
+  .checkin-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    font-size: 0.65rem;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .checkin-dot:hover { border-color: var(--copper); }
+  .checkin-dot.selected { background: var(--copper); border-color: var(--copper); color: var(--navy); }
+
+  /* ── PROGRAMME TILES ── */
+  .prog-tile {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .prog-icon { font-size: 1.2rem; }
+  .prog-name { font-size: 0.72rem; color: var(--cream); }
+  .prog-desc { font-size: 0.62rem; color: var(--dim); line-height: 1.5; }
+  .prog-cta {
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--copper);
+    text-decoration: none;
+    margin-top: 4px;
+  }
+
+  /* ── PHARMACY ── */
+  .rx-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .rx-item:last-child { border-bottom: none; }
+  .rx-bar-wrap { flex: 1; }
+  .rx-name { font-size: 0.72rem; color: var(--cream); margin-bottom: 5px; }
+  .rx-bar-track { height: 3px; background: rgba(184,115,51,0.15); border-radius: 2px; }
+  .rx-bar { height: 3px; background: var(--copper); border-radius: 2px; transition: width 1s ease; }
+  .rx-days { font-size: 0.6rem; color: var(--dim); }
+  .rx-refill {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--copper);
+    border: 1px solid var(--line);
+    border-radius: 1px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background: transparent;
+    font-family: 'Didact Gothic', sans-serif;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .rx-refill:hover { background: rgba(184,115,51,0.1); }
+
+  /* ── ALERTS / NOTIFICATIONS ── */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid;
+    border-radius: 2px;
+    margin-bottom: 12px;
+  }
+  .alert-copper {
+    border-color: rgba(184,115,51,0.4);
+    background: rgba(184,115,51,0.06);
+  }
+  .alert-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--copper);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .alert-text { font-size: 0.72rem; color: var(--dim); line-height: 1.6; }
+  .alert-text strong { color: var(--cream); }
+
+  /* ── TREATMENT SUITE ── */
+  .treatment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .treatment-tile {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .treatment-tile:hover { border-color: var(--copper); background: rgba(184,115,51,0.05); }
+  .treatment-tile.active { border-color: var(--copper); background: rgba(184,115,51,0.08); }
+  .tt-cat { font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--copper); margin-bottom: 6px; }
+  .tt-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); margin-bottom: 4px; }
+  .tt-sub  { font-size: 0.62rem; color: var(--dim); line-height: 1.5; }
+  .tt-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+    padding: 2px 7px;
+    border-radius: 1px;
+    background: rgba(184,115,51,0.15);
+    color: var(--tan);
+    border: 1px solid var(--line);
+  }
+
+  /* ── MOBILE TOGGLE ── */
+  .mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 16px; left: 16px;
+    z-index: 200;
+    background: var(--copper);
+    border: none;
+    color: var(--navy);
+    width: 36px; height: 36px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    :root { --sidebar: 0px; }
+    aside { transform: translateX(-240px); width: 240px; transition: transform 0.3s; }
+    aside.open { transform: translateX(0); }
+    main { margin-left: 0; padding: 60px 20px 80px; max-width: 100vw; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .checkin-grid { grid-template-columns: repeat(2, 1fr); }
+    .treatment-grid { grid-template-columns: 1fr 1fr; }
+    .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+  }
+
+  @media (max-width: 500px) {
+    .grid-4, .grid-3 { grid-template-columns: 1fr; }
+    .treatment-grid { grid-template-columns: 1fr; }
+    .checkin-grid { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="document.querySelector('aside').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside>
+    <div class="sidebar-brand">
+      <a href="index.html" class="sidebar-logo">Revive</a>
+      <div class="sidebar-tagline">Hormone Optimisation</div>
+    </div>
+
+    <div class="sidebar-section">Patient</div>
+    <nav>
+      <a href="dashboard.html" class="active">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="assessment.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h8M2 13h6"/></svg>
+        My Assessment
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 5v3l2 1"/></svg>
+        My Protocol
+      </a>
+      <a href="trt-calendar.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="12" rx="1"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+        Injection Tracker
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11V5a2 2 0 012-2h8a2 2 0 012 2v6l-2 2H4l-2-2z"/></svg>
+        Messages
+      </a>
+    </nav>
+
+    <div class="sidebar-section">Treatments</div>
+    <nav>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M8 5v6M5 8h6"/></svg>
+        TRT / HRT
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M8 4l4 4-4 4"/></svg>
+        Weight Loss
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14l4-8 3 5 2-3 3 6"/></svg>
+        Longevity
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M6 10l2-4 2 4"/></svg>
+        Sexual Health
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-name">James M.</div>
+      <div class="user-plan">Performance Plan</div>
+      <span class="user-plan-badge">Active · Month 3</span>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <div class="page-head">
+      <div>
+        <div class="page-eyebrow">Patient Portal</div>
+        <h1 class="page-title">Good morning, <em>James</em></h1>
+      </div>
+      <div class="date-tag" id="dateTag"></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="dashboard-section">
+      <div class="alert alert-copper">
+        <div class="alert-dot"></div>
+        <div class="alert-text"><strong>Blood results ready.</strong> Your 3-month panel has been reviewed by Dr. Williams. New protocol adjustments are available in your treatment plan.</div>
+      </div>
+    </div>
+
+    <!-- INJECTION + CLINICIAN -->
+    <div class="dashboard-section">
+      <div class="section-label">Next Dose</div>
+      <div class="injection-card">
+        <div class="inj-countdown">
+          <div class="inj-days" id="injDays">3</div>
+          <div class="inj-days-label">days</div>
+        </div>
+        <div class="inj-divider"></div>
+        <div class="inj-info">
+          <div class="inj-drug">Testosterone Cypionate</div>
+          <div class="inj-dose">100mg / 0.5ml · IM injection · Monday & Thursday</div>
+        </div>
+        <button class="inj-btn" onclick="this.textContent='✓ Logged'">Log Dose</button>
+      </div>
+    </div>
+
+    <!-- BIOMARKERS -->
+    <div class="dashboard-section">
+      <div class="section-label">Latest Biomarkers</div>
+      <div class="grid-4" id="biomarker-grid"></div>
+    </div>
+
+    <!-- T TREND CHART + CHECKIN -->
+    <div class="dashboard-section">
+      <div class="grid-2">
+
+        <div class="card">
+          <div class="card-label">Testosterone Trend — 6 months</div>
+          <div class="chart-wrap">
+            <svg viewBox="0 0 400 130" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#b87333" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#b87333" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- grid -->
+              <g class="chart-grid">
+                <line x1="0" y1="32" x2="400" y2="32"/>
+                <line x1="0" y1="65" x2="400" y2="65"/>
+                <line x1="0" y1="98" x2="400" y2="98"/>
+              </g>
+              <!-- fill -->
+              <path class="chart-fill"
+                d="M0,100 C60,90 80,70 130,55 S200,40 250,35 S320,25 400,22 L400,130 L0,130 Z"/>
+              <!-- line -->
+              <path class="chart-line"
+                d="M0,100 C60,90 80,70 130,55 S200,40 250,35 S320,25 400,22"/>
+              <!-- dots -->
+              <circle class="chart-dot" cx="0"   cy="100" r="3"/>
+              <circle class="chart-dot" cx="80"  cy="70"  r="3"/>
+              <circle class="chart-dot" cx="160" cy="52"  r="3"/>
+              <circle class="chart-dot" cx="240" cy="38"  r="3"/>
+              <circle class="chart-dot" cx="320" cy="26"  r="3"/>
+              <circle class="chart-dot" cx="400" cy="22"  r="4"/>
+            </svg>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--dim);margin-top:4px;letter-spacing:0.1em;">
+            <span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Daily Check-in</div>
+          <div class="checkin-grid" style="margin-top:16px;">
+            <div class="checkin-item">
+              <div class="checkin-label">Energy</div>
+              <div class="checkin-scale" id="ci-energy"></div>
+            </div>
+            <div class="checkin-item">
+              <div class="checkin-label">Mood</div>
+              <div class="checkin-scale" id="ci-mood"></div>
+            </div>
+            <div class="checkin-item">
+              <div class="checkin-label">Libido</div>
+              <div class="checkin-scale" id="ci-libido"></div>
+            </div>
+            <div class="checkin-item">
+              <div class="checkin-label">Sleep</div>
+              <div class="checkin-scale" id="ci-sleep"></div>
+            </div>
+          </div>
+          <button onclick="saveCheckin(this)" style="margin-top:20px;width:100%;padding:12px;background:transparent;border:1px solid var(--line);color:var(--dim);font-family:'Didact Gothic',sans-serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;">
+            Save Today's Check-in
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MY PROTOCOL -->
+    <div class="dashboard-section">
+      <div class="section-label">Current Protocol</div>
+      <div class="card">
+        <div class="protocol-grid">
+          <div class="protocol-item">
+            <div class="pi-name">Testosterone Cypionate</div>
+            <div class="pi-dose">100mg / 0.5ml</div>
+            <div class="pi-freq">Mon & Thu · IM</div>
+          </div>
+          <div class="protocol-item">
+            <div class="pi-name">Anastrozole</div>
+            <div class="pi-dose">0.25mg</div>
+            <div class="pi-freq">Twice weekly · oral</div>
+          </div>
+          <div class="protocol-item">
+            <div class="pi-name">HCG</div>
+            <div class="pi-dose">500 IU</div>
+            <div class="pi-freq">Twice weekly · SC</div>
+          </div>
+          <div class="protocol-item">
+            <div class="pi-name">Vitamin D3/K2</div>
+            <div class="pi-dose">5,000 IU / 100mcg</div>
+            <div class="pi-freq">Daily · oral</div>
+          </div>
+          <div class="protocol-item">
+            <div class="pi-name">Omega-3</div>
+            <div class="pi-dose">2g EPA/DHA</div>
+            <div class="pi-freq">Daily · oral</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TREATMENT SUITE + PHARMACY -->
+    <div class="dashboard-section">
+      <div class="grid-2">
+
+        <div>
+          <div class="section-label">Treatment Suite</div>
+          <div class="treatment-grid">
+            <div class="treatment-tile active">
+              <div class="tt-cat">Core</div>
+              <div class="tt-name">TRT Protocol</div>
+              <div class="tt-sub">Active testosterone replacement</div>
+              <span class="tt-badge">Active</span>
+            </div>
+            <div class="treatment-tile">
+              <div class="tt-cat">Weight Loss</div>
+              <div class="tt-name">Semaglutide</div>
+              <div class="tt-sub">GLP-1 appetite regulation</div>
+              <span class="tt-badge">Add On</span>
+            </div>
+            <div class="treatment-tile">
+              <div class="tt-cat">Sexual Health</div>
+              <div class="tt-name">Tadalafil</div>
+              <div class="tt-sub">Daily low-dose ED support</div>
+              <span class="tt-badge">Add On</span>
+            </div>
+            <div class="treatment-tile">
+              <div class="tt-cat">Longevity</div>
+              <div class="tt-name">NAD+ IV</div>
+              <div class="tt-sub">Cellular energy & repair</div>
+              <span class="tt-badge">Add On</span>
+            </div>
+            <div class="treatment-tile">
+              <div class="tt-cat">Hair & Skin</div>
+              <div class="tt-name">Finasteride</div>
+              <div class="tt-sub">DHT inhibition protocol</div>
+              <span class="tt-badge">Add On</span>
+            </div>
+            <div class="treatment-tile">
+              <div class="tt-cat">Peptides</div>
+              <div class="tt-name">BPC-157</div>
+              <div class="tt-sub">Healing & recovery peptide</div>
+              <span class="tt-badge">Add On</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label">Pharmacy</div>
+          <div class="card" style="padding:16px 20px;">
+            <div class="rx-item">
+              <div class="rx-bar-wrap">
+                <div class="rx-name">Testosterone Cypionate</div>
+                <div class="rx-bar-track"><div class="rx-bar" style="width:60%"></div></div>
+                <div class="rx-days">~18 days remaining</div>
+              </div>
+              <button class="rx-refill">Reorder</button>
+            </div>
+            <div class="rx-item">
+              <div class="rx-bar-wrap">
+                <div class="rx-name">Anastrozole 0.25mg</div>
+                <div class="rx-bar-track"><div class="rx-bar" style="width:35%"></div></div>
+                <div class="rx-days">~10 days remaining</div>
+              </div>
+              <button class="rx-refill">Reorder</button>
+            </div>
+            <div class="rx-item">
+              <div class="rx-bar-wrap">
+                <div class="rx-name">HCG 500 IU</div>
+                <div class="rx-bar-track"><div class="rx-bar" style="width:80%"></div></div>
+                <div class="rx-days">~24 days remaining</div>
+              </div>
+              <button class="rx-refill">Reorder</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CLINICIAN MESSAGE -->
+    <div class="dashboard-section">
+      <div class="section-label">My Clinician</div>
+      <div class="card">
+        <div class="clinician-card">
+          <div class="clinician-avatar">DW</div>
+          <div>
+            <div class="clinician-name">Dr. David Williams</div>
+            <div class="clinician-role">TRT Specialist · GMC 7654321</div>
+          </div>
+        </div>
+        <div class="msg-input-row">
+          <input class="msg-input" type="text" placeholder="Message your clinician...">
+          <button class="msg-send">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAMMES -->
+    <div class="dashboard-section">
+      <div class="section-label">Programmes</div>
+      <div class="grid-3">
+        <div class="card card-sm">
+          <div class="prog-icon">🏋️</div>
+          <div class="prog-name">TRT Training Protocol</div>
+          <div class="prog-desc">Resistance programme optimised for your current testosterone levels and recovery capacity.</div>
+          <a href="#" class="prog-cta">View Programme →</a>
+        </div>
+        <div class="card card-sm">
+          <div class="prog-icon">🥩</div>
+          <div class="prog-name">Hormonal Nutrition</div>
+          <div class="prog-desc">Protein targets, micronutrient optimisation, and dietary fats to support steroidogenesis.</div>
+          <a href="#" class="prog-cta">View Programme →</a>
+        </div>
+        <div class="card card-sm">
+          <div class="prog-icon">🌙</div>
+          <div class="prog-name">Sleep Recovery</div>
+          <div class="prog-desc">Protocol to maximise nocturnal testosterone production and HGH pulse amplitude.</div>
+          <a href="#" class="prog-cta">View Programme →</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── BIOMARKER RING GAUGES ──
+  // value: actual reading, min/max: reference range, status: good/warn/low
+  const biomarkers = [
+    { label:'Total Testosterone', value:28.4, display:'28.4', unit:'nmol/L', range:'8.6–29.0', min:8.6,  max:32,   status:'good', statusText:'Optimal' },
+    { label:'Free Testosterone',  value:485,  display:'485',  unit:'pmol/L', range:'170–670', min:0,    max:670,  status:'good', statusText:'Optimal' },
+    { label:'Estradiol (E2)',      value:142,  display:'142',  unit:'pmol/L', range:'90–160',  min:0,    max:200,  status:'warn', statusText:'Monitor' },
+    { label:'Haematocrit',        value:46.2, display:'46.2', unit:'%',      range:'38–52',   min:30,   max:60,   status:'good', statusText:'Normal'  },
+    { label:'SHBG',               value:22,   display:'22',   unit:'nmol/L', range:'17–55',   min:0,    max:60,   status:'good', statusText:'Good'    },
+    { label:'PSA',                value:0.8,  display:'0.8',  unit:'ng/mL',  range:'<4.0',    min:0,    max:5,    status:'good', statusText:'Normal'  },
+    { label:'LH',                 value:0.4,  display:'0.4',  unit:'IU/L',   range:'Suppressed',min:0,  max:2,    status:'warn', statusText:'On TRT'  },
+    { label:'Vitamin D',          value:74,   display:'74',   unit:'nmol/L', range:'>75',     min:0,    max:120,  status:'warn', statusText:'Low-Normal'},
+  ];
+
+  const R = 42; // ring radius
+  const CIRC = 2 * Math.PI * R; // circumference
+
+  function makeBiomarkerTile(bm) {
+    // pct of range filled (0–1), clamped
+    const pct = Math.min(Math.max((bm.value - bm.min) / (bm.max - bm.min), 0), 1);
+    const dashFill   = pct * CIRC;
+    const dashOffset = CIRC - dashFill;
+
+    const div = document.createElement('div');
+    div.className = 'biomarker';
+    div.innerHTML = `
+      <div class="bm-ring-wrap">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle class="bm-ring-track" cx="50" cy="50" r="${R}"
+            stroke-dasharray="${CIRC}" stroke-dashoffset="0"/>
+          <circle class="bm-ring-fill ${bm.status}" cx="50" cy="50" r="${R}"
+            stroke-dasharray="${CIRC}"
+            stroke-dashoffset="${CIRC}"
+            data-target="${dashOffset}"/>
+        </svg>
+        <div class="bm-ring-inner">
+          <div class="bm-value">${bm.display}</div>
+          <div class="bm-unit">${bm.unit}</div>
+        </div>
+      </div>
+      <div class="bm-label">${bm.label}</div>
+      <div class="bm-range">${bm.range}</div>
+      <span class="bm-status ${bm.status}">${bm.statusText}</span>
+    `;
+    return div;
+  }
+
+  const grid = document.getElementById('biomarker-grid');
+  biomarkers.forEach(bm => grid.appendChild(makeBiomarkerTile(bm)));
+
+  // Animate rings in after paint
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.bm-ring-fill').forEach(el => {
+        el.style.strokeDashoffset = el.dataset.target;
+      });
+    }, 150);
+  });
+
+  // Date
+  const d = new Date();
+  document.getElementById('dateTag').textContent = d.toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Check-in dots
+  ['energy','mood','libido','sleep'].forEach(id => {
+    const wrap = document.getElementById('ci-' + id);
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'checkin-dot';
+      dot.textContent = i;
+      dot.onclick = () => {
+        wrap.querySelectorAll('.checkin-dot').forEach(d => d.classList.remove('selected'));
+        dot.classList.add('selected');
+      };
+      wrap.appendChild(dot);
+    }
+  });
+
+  function saveCheckin(btn) {
+    btn.textContent = '✓ Saved';
+    btn.style.borderColor = 'var(--copper)';
+    btn.style.color = 'var(--copper)';
+  }
+</script>
+
+</body>
+</html>
