@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Podcast Creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0d1520;
+    --navy2:  #111d2b;
+    --cream:  #fbf3da;
+    --copper: #b87333;
+    --tan:    #bd9468;
+    --dim:    rgba(251,243,218,0.45);
+    --line:   rgba(184,115,51,0.2);
+    --sidebar:220px;
+    --green:  #3cb371;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--navy2); color: var(--cream); font-family: 'Didact Gothic', sans-serif; overflow-x: hidden; }
+
+  /* SIDEBAR */
+  aside { width: var(--sidebar); min-height: 100vh; background: #0a1018; border-right: 1px solid var(--line); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 50; padding: 0 0 24px; }
+  .sb-brand { padding: 24px 20px; border-bottom: 1px solid var(--line); }
+  .sb-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; letter-spacing: 0.3em; color: var(--copper); text-transform: uppercase; text-decoration: none; display: block; }
+  .sb-tag  { font-size: 0.5rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-top: 3px; }
+  .sb-badge { margin: 12px 20px 0; background: rgba(184,115,51,0.1); border: 1px solid var(--line); border-radius: 1px; padding: 4px 10px; font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--copper); text-align: center; }
+  .sb-section { font-size: 0.48rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); padding: 18px 20px 6px; opacity: 0.7; }
+  nav a { display: flex; align-items: center; gap: 9px; padding: 9px 20px; font-size: 0.7rem; color: var(--dim); text-decoration: none; letter-spacing: 0.07em; transition: all 0.2s; position: relative; }
+  nav a:hover { color: var(--cream); background: rgba(184,115,51,0.06); }
+  nav a.active { color: var(--cream); background: rgba(184,115,51,0.1); }
+  nav a.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--copper); }
+  .sb-user { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--line); }
+  .sb-user-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); }
+  .sb-user-role { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--copper); }
+  .btn-signout { margin-top: 8px; font-size: 0.58rem; color: var(--dim); background: none; border: none; cursor: pointer; letter-spacing: 0.1em; padding: 0; }
+  .btn-signout:hover { color: var(--cream); }
+
+  /* MAIN */
+  main { margin-left: var(--sidebar); padding: 36px 36px 80px; }
+  .page-head { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .page-eyebrow { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 6px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--cream); }
+  .page-title em { font-style: italic; color: var(--tan); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 2px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .tab { padding: 10px 20px; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+  .tab:hover { color: var(--cream); }
+  .tab.active { color: var(--copper); border-bottom-color: var(--copper); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* CARDS */
+  .card { background: rgba(17,29,43,0.8); border: 1px solid var(--line); border-radius: 2px; padding: 28px; margin-bottom: 20px; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--cream); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .card-sub { font-size: 0.68rem; color: var(--dim); line-height: 1.7; margin-bottom: 16px; }
+
+  /* FORM */
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .field label { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); }
+  .field input, .field select, .field textarea {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px;
+    padding: 12px 14px; color: var(--cream); font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.78rem; outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--copper); }
+  .field input::placeholder, .field textarea::placeholder { color: rgba(251,243,218,0.2); }
+  .field select option { background: #111d2b; }
+  .field textarea { resize: vertical; min-height: 160px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* BUTTONS */
+  .btn { padding: 12px 24px; font-family: 'Didact Gothic', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border-radius: 1px; transition: all 0.2s; border: none; }
+  .btn-primary { background: var(--copper); color: var(--navy); }
+  .btn-primary:hover { background: var(--tan); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--dim); }
+  .btn-outline:hover { border-color: var(--copper); color: var(--cream); }
+  .btn-green { background: rgba(60,179,113,0.15); border: 1px solid rgba(60,179,113,0.35); color: var(--green); }
+  .btn-green:hover { background: rgba(60,179,113,0.25); }
+  .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+
+  /* SCRIPT OUTPUT */
+  .script-wrap {
+    background: rgba(10,16,24,0.9); border: 1px solid var(--line); border-radius: 2px;
+    padding: 24px; font-size: 0.78rem; line-height: 1.9; color: var(--cream);
+    white-space: pre-wrap; max-height: 520px; overflow-y: auto; margin-bottom: 16px;
+    font-family: 'Didact Gothic', sans-serif;
+  }
+  .script-wrap:focus { outline: none; border-color: var(--copper); }
+
+  /* STATUS */
+  .status-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 2px; font-size: 0.7rem; margin-bottom: 16px; }
+  .status-generating { background: rgba(184,115,51,0.1); border: 1px solid rgba(184,115,51,0.3); color: var(--tan); }
+  .status-done       { background: rgba(60,179,113,0.1); border: 1px solid rgba(60,179,113,0.3); color: var(--green); }
+  .status-error      { background: rgba(224,53,53,0.1);  border: 1px solid rgba(224,53,53,0.3);  color: #e05555; }
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(184,115,51,0.3); border-top-color: var(--copper); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SECTION LABEL */
+  .section-label { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--line); }
+
+  /* PODCAST LIST */
+  .podcast-list { display: flex; flex-direction: column; gap: 12px; }
+  .podcast-item { background: rgba(17,29,43,0.7); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; }
+  .podcast-item:hover { border-color: rgba(184,115,51,0.4); }
+  .pod-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pod-status.published { background: var(--green); }
+  .pod-status.draft { background: var(--copper); }
+  .pod-info { flex: 1; }
+  .pod-title { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); margin-bottom: 3px; }
+  .pod-meta { font-size: 0.6rem; color: var(--dim); letter-spacing: 0.08em; }
+  .pod-badge { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: 1px; flex-shrink: 0; }
+  .pod-badge.published { background: rgba(60,179,113,0.12); color: var(--green); border: 1px solid rgba(60,179,113,0.25); }
+  .pod-badge.draft { background: rgba(184,115,51,0.12); color: var(--tan); border: 1px solid var(--line); }
+  .pod-actions { display: flex; gap: 8px; }
+  .pod-btn { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 5px 12px; border-radius: 1px; cursor: pointer; font-family: 'Didact Gothic', sans-serif; border: 1px solid var(--line); background: transparent; color: var(--dim); transition: all 0.2s; }
+  .pod-btn:hover { border-color: var(--copper); color: var(--cream); }
+  .pod-btn.publish { border-color: rgba(60,179,113,0.4); color: var(--green); }
+  .pod-btn.publish:hover { background: rgba(60,179,113,0.1); }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--dim); font-size: 0.72rem; letter-spacing: 0.1em; }
+
+  @media (max-width: 900px) {
+    :root { --sidebar: 0px; }
+    main { margin-left: 0; padding: 20px 16px 60px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="sb-brand">
+    <a href="index.html" class="sb-logo">Revive</a>
+    <div class="sb-tag">Hormone Optimisation</div>
+  </div>
+  <div class="sb-badge">Clinician Portal</div>
+  <div class="sb-section">Patients</div>
+  <nav>
+    <a href="admin.html">All Patients</a>
+  </nav>
+  <div class="sb-section">Content</div>
+  <nav>
+    <a href="admin-podcasts.html" class="active">Podcast Creator</a>
+  </nav>
+  <div class="sb-section">Tools</div>
+  <nav>
+    <a href="trt-calendar.html">Injection Tracker</a>
+    <a href="assessment.html">View Assessment</a>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-user-name" id="clinicianName">Clinician</div>
+    <div class="sb-user-role">Authorised Access</div>
+    <button class="btn-signout" onclick="handleSignOut()">Sign out →</button>
+  </div>
+</aside>
+
+<main>
+  <div class="page-head">
+    <div>
+      <div class="page-eyebrow">Content Studio</div>
+      <h1 class="page-title">Podcast <em>Creator</em></h1>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('create')">Create New</div>
+    <div class="tab" onclick="switchTab('library')">Published Library</div>
+    <div class="tab" onclick="switchTab('drafts')">Drafts</div>
+  </div>
+
+  <!-- CREATE TAB -->
+  <div class="tab-panel active" id="tab-create">
+
+    <div class="card">
+      <div class="card-title">Step 1 — Upload Study</div>
+      <p class="card-sub">Paste the clinical study text, abstract, or key findings below. Claude will convert it into an engaging podcast script for your patients.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Episode Title</label>
+          <input type="text" id="episodeTitle" placeholder="e.g. TRT and Cardiovascular Health — 2026 Review">
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="episodeCategory">
+            <option value="trt">TRT — Male Hormone Therapy</option>
+            <option value="hrt">HRT — Female Hormone Therapy</option>
+            <option value="longevity">Longevity & Healthspan</option>
+            <option value="sexual-health">Sexual Health</option>
+            <option value="weight-loss">Weight Loss & Metabolism</option>
+            <option value="nutrition">Nutrition & Lifestyle</option>
+            <option value="general">General Hormone Health</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Study / Source (DOI, URL, or reference)</label>
+        <input type="text" id="studySource" placeholder="e.g. DOI: 10.1016/j.jnufbio.2009.06.004 or paste URL">
+      </div>
+
+      <div class="field">
+        <label>Study Text or Abstract</label>
+        <textarea id="studyText" placeholder="Paste the full study text, abstract, or key findings here. The more detail you provide, the richer the podcast script will be.&#10;&#10;You can also summarise key points in plain language and Claude will structure them into a podcast episode."></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Target Audience</label>
+          <select id="targetAudience">
+            <option value="patient">Patients (accessible language)</option>
+            <option value="clinician">Clinicians (technical)</option>
+            <option value="both">Mixed audience</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Episode Length</label>
+          <select id="episodeLength">
+            <option value="short">Short (5–8 min)</option>
+            <option value="medium" selected>Medium (10–15 min)</option>
+            <option value="long">Long (20–25 min)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="generateBtn" onclick="generateScript()">Generate Podcast Script</button>
+        <span style="font-size:0.62rem;color:var(--dim);">Powered by Claude AI</span>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div id="statusBar" style="display:none;"></div>
+
+    <!-- SCRIPT OUTPUT -->
+    <div id="scriptSection" style="display:none;">
+      <div class="card">
+        <div class="card-title">Step 2 — Review & Edit Script</div>
+        <p class="card-sub">Review the generated script below. Click to edit directly. When ready, publish to the patient Inner Circle.</p>
+        <div class="section-label">Generated Script</div>
+        <div class="script-wrap" id="scriptOutput" contenteditable="true"></div>
+        <div class="btn-row">
+          <button class="btn btn-green" onclick="publishPodcast()">Publish to Inner Circle</button>
+          <button class="btn btn-outline" onclick="saveDraft()">Save as Draft</button>
+          <button class="btn btn-outline" onclick="regenerate()">Regenerate</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIBRARY TAB -->
+  <div class="tab-panel" id="tab-library">
+    <div class="section-label">Published Episodes</div>
+    <div class="podcast-list" id="publishedList">
+      <div class="empty">Loading published episodes…</div>
+    </div>
+  </div>
+
+  <!-- DRAFTS TAB -->
+  <div class="tab-panel" id="tab-drafts">
+    <div class="section-label">Draft Episodes</div>
+    <div class="podcast-list" id="draftList">
+      <div class="empty">Loading drafts…</div>
+    </div>
+  </div>
+
+</main>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain: "revive-clinic-885e7.firebaseapp.com",
+    projectId: "revive-clinic-885e7",
+    storageBucket: "revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId: "1075531492371",
+    appId: "1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUser = null;
+  let currentDocId = null;
+
+  // Auth gate
+  onAuthStateChanged(auth, async user => {
+    if (!user) return window.location.href = 'admin-login.html';
+    currentUser = user;
+    document.getElementById('clinicianName').textContent = user.displayName || user.email;
+    loadPodcasts();
+  });
+
+  window.handleSignOut = async () => { await signOut(auth); window.location.href = 'admin-login.html'; };
+
+  // ── TAB SWITCHING ──
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['create','library','drafts'][i] === tab));
+    document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', ['tab-create','tab-library','tab-drafts'][i] === 'tab-'+tab));
+  };
+
+  // ── GENERATE SCRIPT ──
+  window.generateScript = async function() {
+    const title    = document.getElementById('episodeTitle').value.trim();
+    const text     = document.getElementById('studyText').value.trim();
+    const source   = document.getElementById('studySource').value.trim();
+    const audience = document.getElementById('targetAudience').value;
+    const length   = document.getElementById('episodeLength').value;
+    const category = document.getElementById('episodeCategory').value;
+
+    if (!title) return showStatus('error', 'Please enter an episode title.');
+    if (!text)  return showStatus('error', 'Please paste the study text or abstract.');
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    showStatus('generating', 'Claude is generating your podcast script…');
+    document.getElementById('scriptSection').style.display = 'none';
+
+    const lengthMap = { short: '5–8 minutes', medium: '10–15 minutes', long: '20–25 minutes' };
+    const audienceMap = { patient: 'patients (use accessible, encouraging language — avoid heavy jargon)', clinician: 'clinicians (technical, precise)', both: 'a mixed audience of patients and clinicians' };
+
+    const prompt = `You are a medical podcast scriptwriter for REVIVE, a premium hormone optimisation clinic in the UK.
+
+Convert the following clinical study into an engaging podcast script titled: "${title}"
+
+Target audience: ${audienceMap[audience]}
+Episode length: ${lengthMap[length]}
+Category: ${category}
+${source ? 'Source: ' + source : ''}
+
+STUDY CONTENT:
+${text}
+
+Write a complete podcast script with:
+1. A warm, professional opening (introduce the episode and what listeners will learn)
+2. Background context (why this topic matters for hormone health)
+3. Key findings from the study (explain clearly, use real numbers from the study)
+4. What this means for patients on TRT or HRT
+5. Clinical takeaways and practical implications
+6. A closing summary with a call to action (consult your clinician, log your symptoms, etc.)
+
+Format the script with clear section headers. Write it as spoken word — natural, authoritative, and engaging. Do not include music cues or production notes.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      const script = data.content?.[0]?.text || '';
+
+      if (!script) throw new Error('No script returned');
+
+      document.getElementById('scriptOutput').textContent = script;
+      document.getElementById('scriptSection').style.display = 'block';
+      showStatus('done', 'Script generated. Review and edit below, then publish to the Inner Circle.');
+
+      // Store metadata for publish/draft
+      window._podcastMeta = { title, source, category, audience, length, studyText: text, script };
+
+    } catch(e) {
+      showStatus('error', 'Generation failed: ' + e.message);
+    }
+
+    btn.disabled = false;
+  };
+
+  window.regenerate = function() {
+    document.getElementById('scriptSection').style.display = 'none';
+    window.generateScript();
+  };
+
+  // ── PUBLISH ──
+  window.publishPodcast = async function() {
+    const meta   = window._podcastMeta;
+    const script = document.getElementById('scriptOutput').textContent;
+    if (!meta || !script) return;
+
+    try {
+      const ref = await addDoc(collection(db, 'podcasts'), {
+        title:       meta.title,
+        source:      meta.source,
+        category:    meta.category,
+        audience:    meta.audience,
+        length:      meta.length,
+        studyText:   meta.studyText,
+        script,
+        status:      'published',
+        createdBy:   currentUser.email,
+        createdAt:   serverTimestamp(),
+        publishedAt: serverTimestamp(),
+      });
+      currentDocId = ref.id;
+      showStatus('done', '✓ Published to the Inner Circle. Patients can now access this episode.');
+      loadPodcasts();
+    } catch(e) {
+      showStatus('error', 'Publish failed: ' + e.message);
+    }
+  };
+
+  // ── SAVE DRAFT ──
+  window.saveDraft = async function() {
+    const meta   = window._podcastMeta;
+    const script = document.getElementById('scriptOutput').textContent;
+    if (!meta || !script) return;
+
+    try {
+      await addDoc(collection(db, 'podcasts'), {
+        title:     meta.title,
+        source:    meta.source,
+        category:  meta.category,
+        audience:  meta.audience,
+        length:    meta.length,
+        studyText: meta.studyText,
+        script,
+        status:    'draft',
+        createdBy: currentUser.email,
+        createdAt: serverTimestamp(),
+      });
+      showStatus('done', '✓ Saved as draft.');
+      loadPodcasts();
+    } catch(e) {
+      showStatus('error', 'Save failed: ' + e.message);
+    }
+  };
+
+  // ── LOAD PODCASTS ──
+  async function loadPodcasts() {
+    try {
+      const snap = await getDocs(collection(db, 'podcasts'));
+      const all  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      const published = all.filter(p => p.status === 'published');
+      const drafts    = all.filter(p => p.status === 'draft');
+
+      renderList('publishedList', published, 'published');
+      renderList('draftList', drafts, 'draft');
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  function renderList(elId, items, type) {
+    const el = document.getElementById(elId);
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">No ' + (type === 'published' ? 'published episodes' : 'drafts') + ' yet.</div>';
+      return;
+    }
+    el.innerHTML = items.map(p => {
+      const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') :
+                   p.createdAt?.toDate  ? p.createdAt.toDate().toLocaleDateString('en-GB')   : '—';
+      const catLabel = { trt:'TRT', hrt:'HRT', longevity:'Longevity', 'sexual-health':'Sexual Health', 'weight-loss':'Weight Loss', nutrition:'Nutrition', general:'General' }[p.category] || p.category;
+      return '<div class="podcast-item">' +
+        '<div class="pod-status ' + type + '"></div>' +
+        '<div class="pod-info">' +
+          '<div class="pod-title">' + p.title + '</div>' +
+          '<div class="pod-meta">' + catLabel + ' · ' + date + (p.createdBy ? ' · ' + p.createdBy : '') + '</div>' +
+        '</div>' +
+        '<span class="pod-badge ' + type + '">' + type + '</span>' +
+        (type === 'draft' ? '<button class="pod-btn publish" onclick="publishExisting(\'' + p.id + '\')">Publish</button>' : '') +
+        '</div>';
+    }).join('');
+  }
+
+  window.publishExisting = async function(id) {
+    try {
+      await updateDoc(doc(db, 'podcasts', id), { status: 'published', publishedAt: serverTimestamp() });
+      loadPodcasts();
+    } catch(e) { console.error(e); }
+  };
+
+  // ── STATUS ──
+  function showStatus(type, msg) {
+    const el = document.getElementById('statusBar');
+    el.style.display = 'flex';
+    const icons = { generating: '<div class="spinner"></div>', done: '✓', error: '✕' };
+    el.className = 'status-bar status-' + type;
+    el.innerHTML = icons[type] + ' ' + msg;
+  }
+</script>
+</body>
+</html>
