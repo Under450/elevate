@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Hormone Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #111d2b;
+    --navy2:  #162030;
+    --cream:  #fbf3da;
+    --copper: #b87333;
+    --tan:    #bd9468;
+    --dim:    rgba(251,243,218,0.45);
+    --line:   rgba(184,115,51,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Didact Gothic', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(17,29,43,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--copper);
+    text-decoration: none;
+  }
+
+  .header-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.6;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    position: fixed;
+    top: 69px; left: 0; right: 0;
+    z-index: 99;
+    height: 2px;
+    background: rgba(184,115,51,0.15);
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--copper), var(--tan));
+    transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* ── MAIN SHELL ── */
+  main {
+    min-height: 100vh;
+    padding: 120px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 720px;
+    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .screen.active { display: flex; flex-direction: column; gap: 32px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── PATH SELECTOR ── */
+  .path-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .path-card {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 48px 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    background: rgba(22,32,48,0.6);
+  }
+  .path-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(184,115,51,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .path-card:hover { border-color: var(--copper); transform: translateY(-3px); }
+  .path-card:hover::before { opacity: 1; }
+
+  .path-symbol {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    display: block;
+    color: var(--copper);
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .path-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .path-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  /* ── SECTION HEADING ── */
+  .section-head {
+    border-left: 2px solid var(--copper);
+    padding-left: 20px;
+  }
+  .section-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--cream);
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--tan);
+  }
+  .section-desc {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: var(--dim);
+    line-height: 1.8;
+  }
+
+  /* ── QUESTION BLOCK ── */
+  .question-block {
+    background: rgba(22,32,48,0.5);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .q-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+  .q-sub {
+    font-size: 0.68rem;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+    margin-top: -8px;
+  }
+
+  /* Scale options */
+  .scale-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .scale-btn {
+    flex: 1;
+    min-width: 44px;
+    padding: 10px 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--dim);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .scale-btn:hover { border-color: var(--copper); color: var(--cream); }
+  .scale-btn.selected {
+    background: var(--copper);
+    border-color: var(--copper);
+    color: var(--navy);
+    font-weight: bold;
+  }
+
+  /* Scale labels */
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+    margin-top: -8px;
+  }
+
+  /* Yes/No options */
+  .yn-row { display: flex; gap: 12px; }
+  .yn-btn {
+    flex: 1;
+    padding: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--dim);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .yn-btn:hover { border-color: var(--copper); color: var(--cream); }
+  .yn-btn.selected { background: var(--copper); border-color: var(--copper); color: var(--navy); }
+
+  /* Multi-choice */
+  .mc-grid { display: flex; flex-direction: column; gap: 8px; }
+  .mc-item {
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--dim);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mc-item::before {
+    content: '';
+    width: 14px; height: 14px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .mc-item:hover { border-color: var(--copper); color: var(--cream); }
+  .mc-item.selected {
+    border-color: var(--copper);
+    color: var(--cream);
+    background: rgba(184,115,51,0.08);
+  }
+  .mc-item.selected::before {
+    background: var(--copper);
+    border-color: var(--copper);
+  }
+
+  /* ── NAV BUTTONS ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .btn-back {
+    padding: 14px 28px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--dim);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+  .btn-back:hover { border-color: var(--cream); color: var(--cream); }
+
+  .btn-next {
+    padding: 16px 48px;
+    background: var(--copper);
+    border: none;
+    color: var(--navy);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+    border-radius: 1px;
+    margin-left: auto;
+  }
+  .btn-next:hover { background: var(--tan); transform: translateY(-1px); }
+  .btn-next:active { transform: scale(0.98); }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  /* ── STEP INDICATOR ── */
+  .step-indicator {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* ── RESULTS SCREEN ── */
+  .result-card {
+    background: rgba(22,32,48,0.7);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .result-tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--cream);
+  }
+  .result-body {
+    font-size: 0.78rem;
+    color: var(--dim);
+    line-height: 1.8;
+  }
+  .result-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(184,115,51,0.1);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    color: var(--tan);
+    letter-spacing: 0.15em;
+  }
+  .score-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .test-list { display: flex; flex-direction: column; gap: 8px; }
+  .test-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    font-size: 0.75rem;
+    color: var(--dim);
+  }
+  .test-item::before {
+    content: '→';
+    color: var(--copper);
+    font-size: 0.8rem;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, rgba(184,115,51,0.12), rgba(184,115,51,0.04));
+    border: 1px solid rgba(184,115,51,0.4);
+    border-radius: 2px;
+    padding: 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .cta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--cream);
+  }
+  .cta-sub {
+    font-size: 0.72rem;
+    color: var(--dim);
+    line-height: 1.7;
+    max-width: 440px;
+  }
+  .cta-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--copper);
+  }
+  .cta-price small { font-size: 0.9rem; color: var(--dim); }
+
+  .btn-cta {
+    padding: 18px 56px;
+    background: var(--copper);
+    border: none;
+    color: var(--navy);
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.25s;
+  }
+  .btn-cta:hover { background: var(--tan); transform: translateY(-2px); }
+
+  /* ── COPPER DIVIDER ── */
+  .copper-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--copper), transparent);
+    opacity: 0.3;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    .path-grid { grid-template-columns: 1fr; }
+    .path-card { padding: 32px 24px; }
+    main { padding: 100px 16px 60px; }
+    .question-block { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">Revive</a>
+  <span class="header-tag">Hormone Assessment</span>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar" style="width:0%"></div>
+</div>
+
+<main>
+
+  <!-- ── SCREEN 0: PATH SELECTION ── -->
+  <div class="screen active" id="screen-path">
+    <div class="section-head">
+      <div class="section-eyebrow">Step 1 of 1</div>
+      <h1 class="section-title">Choose your <em>path</em></h1>
+      <p class="section-desc">Your assessment is tailored to your biology. Select the programme that applies to you.</p>
+    </div>
+    <div class="path-grid">
+      <div class="path-card" onclick="startPath('trt')">
+        <span class="path-symbol">♂</span>
+        <div class="path-title">Male Hormone Therapy</div>
+        <p class="path-sub">Testosterone replacement, energy optimisation, and vitality protocols for men.</p>
+      </div>
+      <div class="path-card" onclick="startPath('hrt')">
+        <span class="path-symbol">♀</span>
+        <div class="path-title">Female Hormone Therapy</div>
+        <p class="path-sub">Bespoke HRT for perimenopause, menopause, and beyond. Guided by expert clinicians.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TRT SCREENS (men)
+  ══════════════════════════════════════════════ -->
+
+  <!-- TRT Screen 1: ADAM Questionnaire -->
+  <div class="screen" id="screen-trt-1">
+    <div class="section-head">
+      <div class="section-eyebrow">Men's Assessment · Section 1 of 3</div>
+      <h2 class="section-title">Androgen <em>Deficiency</em> Screen</h2>
+      <p class="section-desc">The ADAM questionnaire identifies symptoms associated with low testosterone. Answer honestly — your results shape your programme.</p>
+    </div>
+
+    <div class="question-block" data-q="adam1">
+      <div class="q-label">Do you have a decrease in libido (sex drive)?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam1','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam1','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam2">
+      <div class="q-label">Do you have a lack of energy?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam2','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam2','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam3">
+      <div class="q-label">Do you have a decrease in strength and/or endurance?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam3','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam3','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam4">
+      <div class="q-label">Have you lost height?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam4','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam4','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam5">
+      <div class="q-label">Have you noticed a decreased enjoyment of life?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam5','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam5','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam6">
+      <div class="q-label">Are you sad and/or grumpy?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam6','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam6','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam7">
+      <div class="q-label">Are your erections less strong?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam7','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam7','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam8">
+      <div class="q-label">Have you noticed a recent deterioration in your ability to play sports?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam8','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam8','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam9">
+      <div class="q-label">Are you falling asleep after dinner?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam9','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam9','No')">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="adam10">
+      <div class="q-label">Has there been a recent deterioration in your work performance?</div>
+      <div class="yn-row">
+        <button class="yn-btn" onclick="selectYN(this,'adam10','Yes')">Yes</button>
+        <button class="yn-btn" onclick="selectYN(this,'adam10','No')">No</button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <span class="step-indicator" id="step-trt-1">0 / 10 answered</span>
+      <button class="btn-next" onclick="nextScreen('trt-2')">Continue →</button>
+    </div>
+  </div>
+
+  <!-- TRT Screen 2: IIEF-5 -->
+  <div class="screen" id="screen-trt-2">
+    <div class="section-head">
+      <div class="section-eyebrow">Men's Assessment · Section 2 of 3</div>
+      <h2 class="section-title">Sexual Health <em>Function</em></h2>
+      <p class="section-desc">The IIEF-5 (International Index of Erectile Function) screens for erectile dysfunction severity. Rate each over the past 4 weeks.</p>
+    </div>
+
+    <div class="question-block" data-q="iief1">
+      <div class="q-label">How do you rate your confidence that you could get and keep an erection?</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'iief1',1)">1<br><span style="font-size:0.6rem">Very Low</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief1',2)">2<br><span style="font-size:0.6rem">Low</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief1',3)">3<br><span style="font-size:0.6rem">Moderate</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief1',4)">4<br><span style="font-size:0.6rem">High</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief1',5)">5<br><span style="font-size:0.6rem">Very High</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="iief2">
+      <div class="q-label">When you had erections with sexual stimulation, how often were they hard enough for penetration?</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'iief2',1)">1<br><span style="font-size:0.6rem">Almost never</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief2',2)">2<br><span style="font-size:0.6rem">A few times</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief2',3)">3<br><span style="font-size:0.6rem">Sometimes</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief2',4)">4<br><span style="font-size:0.6rem">Most times</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief2',5)">5<br><span style="font-size:0.6rem">Almost always</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="iief3">
+      <div class="q-label">During sexual intercourse, how often were you able to maintain your erection after you had penetrated your partner?</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'iief3',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief3',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief3',3)">3</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief3',4)">4</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief3',5)">5</button>
+      </div>
+      <div class="scale-labels"><span>Almost never</span><span>Almost always</span></div>
+    </div>
+
+    <div class="question-block" data-q="iief4">
+      <div class="q-label">During sexual intercourse, how difficult was it to maintain your erection to completion?</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'iief4',1)">1<br><span style="font-size:0.6rem">Extremely difficult</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief4',2)">2<br><span style="font-size:0.6rem">Very difficult</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief4',3)">3<br><span style="font-size:0.6rem">Difficult</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief4',4)">4<br><span style="font-size:0.6rem">Slightly difficult</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'iief4',5)">5<br><span style="font-size:0.6rem">Not difficult</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="iief5">
+      <div class="q-label">When you attempted sexual intercourse, how often was it satisfactory for you?</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'iief5',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief5',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief5',3)">3</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief5',4)">4</button>
+        <button class="scale-btn" onclick="selectScale(this,'iief5',5)">5</button>
+      </div>
+      <div class="scale-labels"><span>Almost never</span><span>Almost always</span></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <span class="step-indicator" id="step-trt-2">0 / 5 answered</span>
+      <button class="btn-next" onclick="nextScreen('trt-3')">Continue →</button>
+    </div>
+  </div>
+
+  <!-- TRT Screen 3: PHQ-9 (men) -->
+  <div class="screen" id="screen-trt-3">
+    <div class="section-head">
+      <div class="section-eyebrow">Men's Assessment · Section 3 of 3</div>
+      <h2 class="section-title">Mood & <em>Wellbeing</em></h2>
+      <p class="section-desc">Over the past 2 weeks, how often have you been bothered by any of the following problems?</p>
+    </div>
+
+    <div class="question-block" data-q="phq1">
+      <div class="q-label">Little interest or pleasure in doing things</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq1',0)">0<br><span style="font-size:0.6rem">Not at all</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq1',1)">1<br><span style="font-size:0.6rem">Several days</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq1',2)">2<br><span style="font-size:0.6rem">More than half</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq1',3)">3<br><span style="font-size:0.6rem">Nearly every day</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="phq2">
+      <div class="q-label">Feeling down, depressed, or hopeless</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq2',0)">0<br><span style="font-size:0.6rem">Not at all</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq2',1)">1<br><span style="font-size:0.6rem">Several days</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq2',2)">2<br><span style="font-size:0.6rem">More than half</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'phq2',3)">3<br><span style="font-size:0.6rem">Nearly every day</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="phq3">
+      <div class="q-label">Trouble falling or staying asleep, or sleeping too much</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq3',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq3',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq3',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq3',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq4">
+      <div class="q-label">Feeling tired or having little energy</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq4',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq4',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq4',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq4',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq5">
+      <div class="q-label">Poor appetite or overeating</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq5',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq5',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq5',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq5',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq6">
+      <div class="q-label">Feeling bad about yourself — or that you are a failure or have let yourself or your family down</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq6',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq6',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq6',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq6',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq7">
+      <div class="q-label">Trouble concentrating on things, such as reading the newspaper or watching television</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq7',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq7',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq7',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq7',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq8">
+      <div class="q-label">Moving or speaking so slowly that others could have noticed. Or the opposite — being so restless that you have been moving a lot more than usual</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq8',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq8',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq8',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq8',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="phq9">
+      <div class="q-label">Thoughts that you would be better off dead, or of hurting yourself in some way</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'phq9',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq9',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq9',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'phq9',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <span class="step-indicator" id="step-trt-3">0 / 9 answered</span>
+      <button class="btn-next" onclick="calcResults('trt')">View My Results →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       HRT SCREENS (women)
+  ══════════════════════════════════════════════ -->
+
+  <!-- HRT Screen 1: Greene Climacteric Scale -->
+  <div class="screen" id="screen-hrt-1">
+    <div class="section-head">
+      <div class="section-eyebrow">Women's Assessment · Section 1 of 2</div>
+      <h2 class="section-title">Menopause <em>Symptom</em> Screen</h2>
+      <p class="section-desc">The Greene Climacteric Scale measures the severity of menopause-related symptoms. Rate how much each has bothered you over the past week.</p>
+    </div>
+
+    <div class="question-block" data-q="greene1">
+      <div class="q-label">Heart beating quickly or strongly</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene1',0)">0<br><span style="font-size:0.6rem">Not at all</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'greene1',1)">1<br><span style="font-size:0.6rem">A little</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'greene1',2)">2<br><span style="font-size:0.6rem">Quite a bit</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'greene1',3)">3<br><span style="font-size:0.6rem">Extremely</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="greene2">
+      <div class="q-label">Feeling tense or nervous</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene2',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene2',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene2',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene2',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene3">
+      <div class="q-label">Difficulty in sleeping</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene3',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene3',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene3',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene3',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene4">
+      <div class="q-label">Excitable</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene4',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene4',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene4',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene4',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene5">
+      <div class="q-label">Attacks of panic</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene5',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene5',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene5',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene5',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene6">
+      <div class="q-label">Difficulty in concentrating</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene6',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene6',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene6',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene6',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene7">
+      <div class="q-label">Feeling tired or lacking in energy</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene7',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene7',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene7',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene7',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene8">
+      <div class="q-label">Loss of interest in most things</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene8',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene8',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene8',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene8',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene9">
+      <div class="q-label">Feeling unhappy or depressed</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene9',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene9',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene9',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene9',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene10">
+      <div class="q-label">Crying spells</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene10',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene10',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene10',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene10',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene11">
+      <div class="q-label">Irritability</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene11',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene11',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene11',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene11',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene12">
+      <div class="q-label">Feeling dizzy or faint</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene12',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene12',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene12',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene12',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene13">
+      <div class="q-label">Pressure or tightness in head or body</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene13',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene13',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene13',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene13',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene14">
+      <div class="q-label">Parts of the body feel numb or tingling</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene14',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene14',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene14',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene14',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene15">
+      <div class="q-label">Headaches</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene15',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene15',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene15',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene15',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene16">
+      <div class="q-label">Hot flushes</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene16',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene16',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene16',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene16',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene17">
+      <div class="q-label">Sweating at night</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene17',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene17',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene17',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene17',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene18">
+      <div class="q-label">Loss of interest in sex</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene18',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene18',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene18',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene18',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene19">
+      <div class="q-label">Dryness or discomfort in vagina</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene19',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene19',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene19',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene19',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene20">
+      <div class="q-label">Discomfort when urinating</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene20',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene20',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene20',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene20',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="question-block" data-q="greene21">
+      <div class="q-label">Unusual joint or muscular discomfort</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'greene21',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene21',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene21',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'greene21',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Extremely</span></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <span class="step-indicator" id="step-hrt-1">0 / 21 answered</span>
+      <button class="btn-next" onclick="nextScreen('hrt-2')">Continue →</button>
+    </div>
+  </div>
+
+  <!-- HRT Screen 2: PHQ-9 (women) -->
+  <div class="screen" id="screen-hrt-2">
+    <div class="section-head">
+      <div class="section-eyebrow">Women's Assessment · Section 2 of 2</div>
+      <h2 class="section-title">Mood & <em>Wellbeing</em></h2>
+      <p class="section-desc">Over the past 2 weeks, how often have you been bothered by any of the following?</p>
+    </div>
+
+    <div class="question-block" data-q="wphq1">
+      <div class="q-label">Little interest or pleasure in doing things</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq1',0)">0<br><span style="font-size:0.6rem">Not at all</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq1',1)">1<br><span style="font-size:0.6rem">Several days</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq1',2)">2<br><span style="font-size:0.6rem">More than half</span></button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq1',3)">3<br><span style="font-size:0.6rem">Nearly every day</span></button>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="wphq2">
+      <div class="q-label">Feeling down, depressed, or hopeless</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq2',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq2',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq2',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq2',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq3">
+      <div class="q-label">Trouble falling or staying asleep, or sleeping too much</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq3',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq3',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq3',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq3',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq4">
+      <div class="q-label">Feeling tired or having little energy</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq4',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq4',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq4',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq4',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq5">
+      <div class="q-label">Poor appetite or overeating</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq5',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq5',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq5',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq5',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq6">
+      <div class="q-label">Feeling bad about yourself — or that you are a failure</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq6',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq6',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq6',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq6',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq7">
+      <div class="q-label">Trouble concentrating on things</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq7',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq7',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq7',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq7',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq8">
+      <div class="q-label">Moving or speaking unusually slowly or restlessly</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq8',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq8',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq8',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq8',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="question-block" data-q="wphq9">
+      <div class="q-label">Thoughts that you would be better off dead, or of hurting yourself</div>
+      <div class="scale-row">
+        <button class="scale-btn" onclick="selectScale(this,'wphq9',0)">0</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq9',1)">1</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq9',2)">2</button>
+        <button class="scale-btn" onclick="selectScale(this,'wphq9',3)">3</button>
+      </div>
+      <div class="scale-labels"><span>Not at all</span><span>Nearly every day</span></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <span class="step-indicator" id="step-hrt-2">0 / 9 answered</span>
+      <button class="btn-next" onclick="calcResults('hrt')">View My Results →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       RESULTS SCREEN
+  ══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-results">
+    <div class="section-head">
+      <div class="section-eyebrow">Your Assessment Results</div>
+      <h2 class="section-title">What your symptoms are <em>telling us</em></h2>
+      <p class="section-desc">Built from your answers using validated clinical screening tools. Below: what we're seeing, the bloodwork that will confirm it, and the programmes that move you forward.</p>
+    </div>
+
+    <div id="findings-container" style="display:flex;flex-direction:column;gap:16px;"></div>
+
+    <div class="copper-line"></div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="section-eyebrow" style="padding-left:0;border:none;font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);">Recommended Bloodwork</div>
+      <div id="tests-container" class="test-list"></div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Ready to reclaim your vitality?</div>
+      <p class="cta-sub">Your results suggest you may benefit from a supervised hormone optimisation programme. Book a consultation with one of our clinicians — your first blood panel is included.</p>
+      <div class="cta-price">From £149 <small>/ month</small></div>
+      <button class="btn-cta" onclick="window.location.href='dashboard.html'">Create My Account →</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── STATE ──
+  const answers = {};
+  let currentPath = null;
+  const screenHistory = ['path'];
+
+  // ── SCREEN NAVIGATION ──
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('screen-' + id);
+    if (el) {
+      el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    updateProgress(id);
+  }
+
+  function updateProgress(screenId) {
+    const steps = {
+      'path': 0,
+      'trt-1': 20, 'trt-2': 50, 'trt-3': 80,
+      'hrt-1': 35, 'hrt-2': 75,
+      'results': 100
+    };
+    document.getElementById('progressBar').style.width = (steps[screenId] || 0) + '%';
+  }
+
+  function startPath(path) {
+    currentPath = path;
+    screenHistory.push(path === 'trt' ? 'trt-1' : 'hrt-1');
+    showScreen(screenHistory[screenHistory.length - 1]);
+  }
+
+  function nextScreen(id) {
+    screenHistory.push(id);
+    showScreen(id);
+  }
+
+  function goBack() {
+    if (screenHistory.length > 1) {
+      screenHistory.pop();
+      showScreen(screenHistory[screenHistory.length - 1]);
+    }
+  }
+
+  // ── INPUT HANDLERS ──
+  function selectYN(btn, key, val) {
+    const block = btn.closest('[data-q]');
+    block.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[key] = val;
+    updateStepCount();
+  }
+
+  function selectScale(btn, key, val) {
+    const block = btn.closest('[data-q]');
+    block.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[key] = val;
+    updateStepCount();
+  }
+
+  function updateStepCount() {
+    // TRT-1 (ADAM)
+    const adam = ['adam1','adam2','adam3','adam4','adam5','adam6','adam7','adam8','adam9','adam10'];
+    const iief = ['iief1','iief2','iief3','iief4','iief5'];
+    const phq  = ['phq1','phq2','phq3','phq4','phq5','phq6','phq7','phq8','phq9'];
+    const greene = Array.from({length:21},(_,i)=>'greene'+(i+1));
+    const wphq = ['wphq1','wphq2','wphq3','wphq4','wphq5','wphq6','wphq7','wphq8','wphq9'];
+
+    function count(keys) { return keys.filter(k => answers[k] !== undefined).length; }
+
+    const s1 = document.getElementById('step-trt-1');
+    const s2 = document.getElementById('step-trt-2');
+    const s3 = document.getElementById('step-trt-3');
+    const h1 = document.getElementById('step-hrt-1');
+    const h2 = document.getElementById('step-hrt-2');
+
+    if (s1) s1.textContent = count(adam) + ' / 10 answered';
+    if (s2) s2.textContent = count(iief) + ' / 5 answered';
+    if (s3) s3.textContent = count(phq) + ' / 9 answered';
+    if (h1) h1.textContent = count(greene) + ' / 21 answered';
+    if (h2) h2.textContent = count(wphq) + ' / 9 answered';
+  }
+
+  // ── RESULTS CALCULATION ──
+  function calcResults(path) {
+    screenHistory.push('results');
+    showScreen('results');
+
+    const findings = [];
+    const tests = [];
+
+    if (path === 'trt') {
+      // ADAM scoring
+      const adamKeys = ['adam1','adam2','adam3','adam4','adam5','adam6','adam7','adam8','adam9','adam10'];
+      const adamYes = adamKeys.filter(k => answers[k] === 'Yes').length;
+      const adamPositive = answers['adam1'] === 'Yes' || answers['adam7'] === 'Yes' || adamYes >= 3;
+
+      if (adamPositive) {
+        findings.push({
+          tag: 'ADAM Screen — Positive',
+          title: 'Signs of Androgen Deficiency',
+          body: 'Your responses indicate symptoms consistent with low testosterone. ' + adamYes + ' of 10 ADAM criteria are positive. Clinically, ' + (answers['adam1']==='Yes'&&answers['adam7']==='Yes' ? 'both libido and erectile function are flagged — a strong indicator for testing.' : 'symptoms across energy, mood, and performance suggest hormonal imbalance.'),
+          color: '#b87333',
+          severity: adamYes >= 6 ? 'High' : adamYes >= 3 ? 'Moderate' : 'Mild'
+        });
+        tests.push('Total Testosterone (nmol/L)', 'Free Testosterone (pmol/L)', 'SHBG', 'LH & FSH', 'Full Blood Count');
+      }
+
+      // IIEF scoring
+      const iiefKeys = ['iief1','iief2','iief3','iief4','iief5'];
+      const iiefScore = iiefKeys.reduce((s,k) => s + (answers[k] || 0), 0);
+      if (iiefScore > 0) {
+        const severity = iiefScore <= 7 ? 'Severe' : iiefScore <= 11 ? 'Moderate' : iiefScore <= 16 ? 'Mild-Moderate' : iiefScore <= 21 ? 'Mild' : 'Normal';
+        findings.push({
+          tag: 'IIEF-5 — ' + severity,
+          title: 'Sexual Function Assessment',
+          body: 'IIEF-5 score: ' + iiefScore + '/25. ' + (severity !== 'Normal' ? 'This falls in the ' + severity.toLowerCase() + ' erectile dysfunction range. TRT has well-documented benefits for erectile function when low testosterone is confirmed.' : 'Erectile function appears within normal range.'),
+          color: iiefScore <= 16 ? '#c0795a' : '#bd9468',
+          severity
+        });
+        if (iiefScore <= 16) tests.push('Estradiol (E2)', 'Prolactin');
+      }
+
+      // PHQ-9 scoring
+      const phqKeys = ['phq1','phq2','phq3','phq4','phq5','phq6','phq7','phq8','phq9'];
+      const phqScore = phqKeys.reduce((s,k) => s + (answers[k] || 0), 0);
+      if (phqScore > 4) {
+        const severity = phqScore <= 9 ? 'Mild' : phqScore <= 14 ? 'Moderate' : phqScore <= 19 ? 'Moderately Severe' : 'Severe';
+        findings.push({
+          tag: 'PHQ-9 — ' + severity,
+          title: 'Mood & Mental Wellbeing',
+          body: 'PHQ-9 score: ' + phqScore + '/27. ' + severity + ' depressive symptoms detected. Low testosterone is strongly linked to mood disruption, cognitive fog, and reduced motivation. Hormone optimisation frequently resolves these symptoms without additional intervention.',
+          color: '#8a7a6a',
+          severity
+        });
+        tests.push('Cortisol', 'Thyroid (TSH, Free T4)', 'Vitamin D');
+      }
+
+    } else {
+      // Greene scoring
+      const greeneKeys = Array.from({length:21},(_,i)=>'greene'+(i+1));
+      const greeneTotal = greeneKeys.reduce((s,k) => s + (answers[k] || 0), 0);
+
+      // Sub-scores
+      const anxiety = ['greene1','greene2','greene3','greene4','greene5','greene6'].reduce((s,k)=>s+(answers[k]||0),0);
+      const depression = ['greene7','greene8','greene9','greene10','greene11'].reduce((s,k)=>s+(answers[k]||0),0);
+      const vasomotor = ['greene16','greene17'].reduce((s,k)=>s+(answers[k]||0),0);
+      const sexual = ['greene18','greene19','greene20'].reduce((s,k)=>s+(answers[k]||0),0);
+
+      if (vasomotor >= 2) {
+        findings.push({
+          tag: 'Vasomotor Symptoms',
+          title: 'Hot Flushes & Night Sweats',
+          body: 'Vasomotor sub-score: ' + vasomotor + '/6. ' + (vasomotor >= 4 ? 'Significant' : 'Moderate') + ' vasomotor symptoms detected. Hot flushes and night sweats are hallmark oestrogen-deficiency symptoms and typically respond well to HRT within 4–8 weeks.',
+          color: '#b87333',
+          severity: vasomotor >= 4 ? 'Significant' : 'Moderate'
+        });
+        tests.push('FSH', 'Oestradiol (E2)', 'LH');
+      }
+
+      if (anxiety >= 6) {
+        findings.push({
+          tag: 'Psychological — Anxiety',
+          title: 'Anxiety & Nervous Symptoms',
+          body: 'Anxiety sub-score: ' + anxiety + '/18. Elevated anxiety, sleep disruption, and concentration difficulties are common in perimenopause and can precede other hormonal symptoms by several years.',
+          color: '#bd9468',
+          severity: anxiety >= 10 ? 'High' : 'Moderate'
+        });
+        tests.push('Cortisol', 'Thyroid (TSH, Free T4)');
+      }
+
+      if (depression >= 5) {
+        findings.push({
+          tag: 'Psychological — Low Mood',
+          title: 'Depression & Mood Symptoms',
+          body: 'Depression sub-score: ' + depression + '/15. Low mood, tearfulness, and loss of interest are frequently hormone-mediated and respond well to oestrogen therapy — often more effectively than antidepressants in perimenopausal women.',
+          color: '#8a7a6a',
+          severity: depression >= 9 ? 'High' : 'Moderate'
+        });
+      }
+
+      if (sexual >= 3) {
+        findings.push({
+          tag: 'Urogenital Symptoms',
+          title: 'Sexual Health & Urogenital Atrophy',
+          body: 'Urogenital sub-score: ' + sexual + '/9. Vaginal dryness, discomfort, and reduced libido are direct effects of oestrogen decline. Local oestrogen therapy and systemic HRT both address these effectively.',
+          color: '#a8856a',
+          severity: sexual >= 6 ? 'Significant' : 'Present'
+        });
+        tests.push('Testosterone (free)', 'DHEA-S');
+      }
+
+      if (findings.length === 0) {
+        findings.push({
+          tag: 'Greene Total — ' + greeneTotal,
+          title: 'Subclinical Hormonal Changes',
+          body: 'Your total Greene score is ' + greeneTotal + '/63. While your symptoms are currently mild, this is an important time to establish a hormonal baseline. Many women benefit from proactive monitoring and preventive optimisation.',
+          color: '#bd9468',
+          severity: 'Mild'
+        });
+      }
+
+      tests.push('Oestradiol (E2)', 'FSH', 'LH', 'Progesterone', 'Full Blood Count', 'Bone Density marker (CTX)');
+
+      // PHQ-9 for women
+      const wphqKeys = ['wphq1','wphq2','wphq3','wphq4','wphq5','wphq6','wphq7','wphq8','wphq9'];
+      const wphqScore = wphqKeys.reduce((s,k)=>s+(answers[k]||0),0);
+      if (wphqScore >= 10) {
+        findings.push({
+          tag: 'PHQ-9 — Score ' + wphqScore,
+          title: 'Significant Depressive Symptoms',
+          body: 'PHQ-9 score: ' + wphqScore + '/27. This warrants attention. In perimenopausal and menopausal women, mood disturbance is frequently hormonal rather than psychiatric. HRT should be considered as first-line treatment before antidepressants.',
+          color: '#7a6a8a',
+          severity: 'Significant'
+        });
+      }
+    }
+
+    // Render findings
+    const fc = document.getElementById('findings-container');
+    fc.innerHTML = '';
+    findings.forEach(f => {
+      fc.innerHTML += `
+        <div class="result-card">
+          <div class="result-tag">${f.tag}</div>
+          <div class="result-title">${f.title}</div>
+          <p class="result-body">${f.body}</p>
+          <div class="result-score">
+            <span class="score-dot" style="background:${f.color}"></span>
+            Severity: ${f.severity}
+          </div>
+        </div>`;
+    });
+
+    // De-dupe and render tests
+    const uniqueTests = [...new Set(tests)];
+    const tc = document.getElementById('tests-container');
+    tc.innerHTML = uniqueTests.map(t => `<div class="test-item">${t}</div>`).join('');
+  }
+</script>
+
+</body>
+</html>
