@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #111d2b;
+    --cream:  #fbf3da;
+    --copper: #b87333;
+    --tan:    #bd9468;
+    --dim:    rgba(251,243,218,0.45);
+    --line:   rgba(184,115,51,0.22);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--navy); color: var(--cream); font-family: 'Didact Gothic', sans-serif; }
+  .page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
+  .card { width: 100%; max-width: 440px; background: rgba(22,32,48,0.8); border: 1px solid var(--line); border-radius: 2px; padding: 48px 40px; display: flex; flex-direction: column; gap: 28px; }
+  .brand { text-align: center; }
+  .brand-logo { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; letter-spacing: 0.3em; color: var(--copper); text-transform: uppercase; text-decoration: none; display: block; }
+  .brand-tag { font-size: 0.58rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-top: 6px; }
+  .card-head { text-align: center; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--cream); }
+  .card-title em { font-style: italic; color: var(--tan); }
+  .card-sub { font-size: 0.68rem; color: var(--dim); margin-top: 8px; line-height: 1.7; letter-spacing: 0.05em; }
+  .fields { display: flex; flex-direction: column; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); }
+  .field input { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px; padding: 13px 16px; color: var(--cream); font-family: 'Didact Gothic', sans-serif; font-size: 0.82rem; outline: none; transition: border-color 0.2s; width: 100%; }
+  .field input:focus { border-color: var(--copper); }
+  .field input::placeholder { color: rgba(251,243,218,0.2); }
+  .forgot { text-align: right; margin-top: -8px; }
+  .forgot a { font-size: 0.62rem; color: var(--dim); text-decoration: none; letter-spacing: 0.08em; }
+  .forgot a:hover { color: var(--copper); }
+  .btn-submit { width: 100%; padding: 16px; background: var(--copper); border: none; color: var(--navy); font-family: 'Didact Gothic', sans-serif; font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; cursor: pointer; border-radius: 1px; transition: all 0.25s; }
+  .btn-submit:hover { background: var(--tan); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error-msg { font-size: 0.68rem; color: #e05555; text-align: center; min-height: 20px; letter-spacing: 0.05em; }
+  .signup-link { text-align: center; font-size: 0.65rem; color: var(--dim); letter-spacing: 0.1em; }
+  .signup-link a { color: var(--copper); text-decoration: none; }
+  .signup-link a:hover { color: var(--tan); }
+  .copper-line { height: 1px; background: linear-gradient(90deg, transparent, var(--copper), transparent); opacity: 0.2; }
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--dim); font-size: 0.58rem; letter-spacing: 0.2em; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <div class="brand">
+      <a href="index.html" class="brand-logo">Revive</a>
+      <div class="brand-tag">Hormone Optimisation Clinic</div>
+    </div>
+    <div class="copper-line"></div>
+    <div class="card-head">
+      <div class="card-title">Welcome <em>back</em></div>
+      <p class="card-sub">Sign in to access your personalised dashboard and hormone optimisation programme.</p>
+    </div>
+    <div class="fields">
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Your password" autocomplete="current-password">
+      </div>
+    </div>
+    <div class="forgot"><a href="#" onclick="handleReset(event)">Forgot password?</a></div>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-submit" id="submitBtn" onclick="handleLogin()">Sign In</button>
+    <div class="divider">or</div>
+    <div class="signup-link">New patient? <a href="assessment.html">Take the assessment</a> &nbsp;·&nbsp; <a href="signup.html">Create account</a></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain: "revive-clinic-885e7.firebaseapp.com",
+    projectId: "revive-clinic-885e7",
+    storageBucket: "revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId: "1075531492371",
+    appId: "1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.handleLogin = async function() {
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const errEl    = document.getElementById('errorMsg');
+    const btn      = document.getElementById('submitBtn');
+
+    errEl.textContent = '';
+    if (!email || !password) return errEl.textContent = 'Please enter your email and password.';
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+
+      // Check if admin — redirect to admin panel
+      const adminDoc = await getDoc(doc(db, 'admins', cred.user.uid));
+      if (adminDoc.exists()) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    } catch(err) {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Incorrect email or password.';
+      } else {
+        errEl.textContent = err.message;
+      }
+    }
+  };
+
+  window.handleReset = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value.trim();
+    const errEl = document.getElementById('errorMsg');
+    if (!email) return errEl.textContent = 'Enter your email address above first.';
+    try {
+      await sendPasswordResetEmail(auth, email);
+      errEl.style.color = '#3cb371';
+      errEl.textContent = 'Password reset email sent. Check your inbox.';
+    } catch(err) {
+      errEl.textContent = 'Could not send reset email. Check the address and try again.';
+    }
+  };
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') window.handleLogin(); });
+</script>
+</body>
+</html>
