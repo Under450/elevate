@@ -144,21 +144,29 @@
   .month-nav__btn svg { width: 14px; height: 14px; }
 
   /* =========== LEGEND =========== */
+  .cal-layout {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
   .legend {
     display: flex;
-    gap: 24px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 16px;
+    flex-shrink: 0;
+    padding-top: 8px;
   }
 
   .legend__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 11px;
+    gap: 10px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--text-mid);
+    white-space: nowrap;
   }
 
   .legend__dot {
@@ -544,7 +552,8 @@
     .check.checked--anc4::after {
       left: 3px; top: 1px; width: 4px; height: 7px;
     }
-    .legend { gap: 14px; }
+    .cal-layout { flex-direction: column; }
+    .legend { flex-direction: row; flex-wrap: wrap; gap: 12px; }
     .legend__item { font-size: 9px; }
     .note-panel { width: 100vw; right: -110vw; }
     .stats { flex-wrap: wrap; }
@@ -577,21 +586,26 @@
     </button>
   </div>
 
-  <!-- Legend -->
-  <div class="legend">
-    <div class="legend__item"><div class="legend__dot legend__dot--inj"></div>Injection</div>
-    <div class="legend__item"><div class="legend__dot legend__dot--anc1"></div>HCG</div>
-    <div class="legend__item"><div class="legend__dot legend__dot--anc2"></div>Anastrozole</div>
-    <div class="legend__item"><div class="legend__dot legend__dot--anc3"></div>B12</div>
-    <div class="legend__item"><div class="legend__dot legend__dot--anc4"></div>Retatrutide</div>
-    <div class="legend__item"><div class="legend__dot legend__dot--anc5"></div>Raloxifene</div>
+  <div class="cal-layout">
+    <!-- Legend sidebar -->
+    <div class="legend">
+      <div class="legend__item"><div class="legend__dot legend__dot--inj"></div>Injection</div>
+      <div class="legend__item"><div class="legend__dot legend__dot--anc1"></div>HCG</div>
+      <div class="legend__item"><div class="legend__dot legend__dot--anc2"></div>Anastrozole</div>
+      <div class="legend__item"><div class="legend__dot legend__dot--anc3"></div>B12</div>
+      <div class="legend__item"><div class="legend__dot legend__dot--anc4"></div>Retatrutide</div>
+      <div class="legend__item"><div class="legend__dot legend__dot--anc5"></div>Raloxifene</div>
+    </div>
+
+    <!-- Calendar + Stats -->
+    <div style="flex:1;min-width:0;">
+      <!-- Calendar -->
+      <div class="cal-grid" id="calGrid"></div>
+
+      <!-- Stats -->
+      <div class="stats" id="stats"></div>
+    </div>
   </div>
-
-  <!-- Calendar -->
-  <div class="cal-grid" id="calGrid"></div>
-
-  <!-- Stats -->
-  <div class="stats" id="stats"></div>
 </div>
 
 <!-- Overlay -->
