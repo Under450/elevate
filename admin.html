@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Clinician Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0d1520;
+    --navy2:  #111d2b;
+    --cream:  #fbf3da;
+    --copper: #b87333;
+    --tan:    #bd9468;
+    --dim:    rgba(251,243,218,0.45);
+    --line:   rgba(184,115,51,0.2);
+    --sidebar:220px;
+    --green:  #3cb371;
+    --amber:  #c4883a;
+    --red:    #e03535;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--navy2); color: var(--cream); font-family: 'Didact Gothic', sans-serif; overflow-x: hidden; }
+
+  /* SIDEBAR */
+  aside {
+    width: var(--sidebar); min-height: 100vh; background: #0a1018;
+    border-right: 1px solid var(--line); display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; z-index: 50; padding: 0 0 24px;
+  }
+  .sb-brand { padding: 24px 20px; border-bottom: 1px solid var(--line); }
+  .sb-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; letter-spacing: 0.3em; color: var(--copper); text-transform: uppercase; text-decoration: none; display: block; }
+  .sb-tag  { font-size: 0.5rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-top: 3px; }
+  .sb-badge { margin: 12px 20px 0; background: rgba(184,115,51,0.1); border: 1px solid var(--line); border-radius: 1px; padding: 4px 10px; font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--copper); text-align: center; }
+  .sb-section { font-size: 0.48rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); padding: 18px 20px 6px; opacity: 0.7; }
+  nav a { display: flex; align-items: center; gap: 9px; padding: 9px 20px; font-size: 0.7rem; color: var(--dim); text-decoration: none; letter-spacing: 0.07em; transition: all 0.2s; position: relative; cursor: pointer; }
+  nav a:hover { color: var(--cream); background: rgba(184,115,51,0.06); }
+  nav a.active { color: var(--cream); background: rgba(184,115,51,0.1); }
+  nav a.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--copper); }
+  .sb-user { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--line); }
+  .sb-user-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); }
+  .sb-user-role { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--copper); }
+  .btn-signout { margin-top: 8px; font-size: 0.58rem; color: var(--dim); background: none; border: none; cursor: pointer; letter-spacing: 0.1em; padding: 0; }
+  .btn-signout:hover { color: var(--cream); }
+
+  /* MAIN */
+  main { margin-left: var(--sidebar); padding: 36px 36px 80px; }
+  .page-head { margin-bottom: 32px; }
+  .page-eyebrow { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 6px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--cream); }
+  .page-title em { font-style: italic; color: var(--tan); }
+
+  /* STATS ROW */
+  .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: rgba(17,29,43,0.8); border: 1px solid var(--line); border-radius: 2px; padding: 20px; }
+  .stat-label { font-size: 0.52rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: var(--cream); line-height: 1; }
+  .stat-sub { font-size: 0.6rem; color: var(--dim); margin-top: 4px; }
+
+  /* SECTION */
+  .section-label { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--line); }
+  .section { margin-bottom: 32px; }
+
+  /* SEARCH / FILTER */
+  .toolbar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+  .search-input { flex: 1; min-width: 200px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px; padding: 10px 14px; color: var(--cream); font-family: 'Didact Gothic', sans-serif; font-size: 0.75rem; outline: none; }
+  .search-input:focus { border-color: var(--copper); }
+  .search-input::placeholder { color: var(--dim); }
+  .filter-select { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px; padding: 10px 14px; color: var(--cream); font-family: 'Didact Gothic', sans-serif; font-size: 0.72rem; outline: none; cursor: pointer; }
+  .filter-select option { background: #111d2b; }
+
+  /* PATIENT TABLE */
+  .patient-table { width: 100%; border-collapse: collapse; }
+  .patient-table th { font-size: 0.52rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); font-weight: normal; }
+  .patient-table td { padding: 14px; border-bottom: 1px solid rgba(184,115,51,0.08); font-size: 0.72rem; color: var(--dim); vertical-align: middle; }
+  .patient-table tr:hover td { background: rgba(184,115,51,0.04); color: var(--cream); cursor: pointer; }
+  .pt-name { color: var(--cream); font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; }
+  .pt-email { font-size: 0.65rem; color: var(--dim); }
+  .badge { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: 1px; }
+  .badge-green { background: rgba(60,179,113,0.12); color: var(--green); border: 1px solid rgba(60,179,113,0.25); }
+  .badge-amber { background: rgba(196,136,58,0.12); color: #e8a855; border: 1px solid rgba(196,136,58,0.25); }
+  .badge-none  { background: rgba(255,255,255,0.05); color: var(--dim); border: 1px solid var(--line); }
+  .score-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.62rem; }
+  .score-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* PATIENT DETAIL PANEL */
+  .detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; }
+  .detail-overlay.open { display: block; }
+  .detail-panel { position: fixed; top: 0; right: -600px; width: 580px; height: 100vh; background: #0d1520; border-left: 1px solid var(--line); z-index: 101; transition: right 0.4s cubic-bezier(0.16,1,0.3,1); overflow-y: auto; display: flex; flex-direction: column; }
+  .detail-panel.open { right: 0; }
+  .dp-head { padding: 28px 28px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
+  .dp-name { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--cream); }
+  .dp-email { font-size: 0.65rem; color: var(--dim); margin-top: 4px; letter-spacing: 0.05em; }
+  .dp-close { background: none; border: none; color: var(--dim); font-size: 1.2rem; cursor: pointer; padding: 4px; }
+  .dp-close:hover { color: var(--cream); }
+  .dp-body { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+  .dp-section-title { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 12px; }
+  .dp-card { background: rgba(22,32,48,0.6); border: 1px solid var(--line); border-radius: 2px; padding: 18px; }
+  .finding-item { padding: 10px 0; border-bottom: 1px solid rgba(184,115,51,0.08); }
+  .finding-item:last-child { border-bottom: none; }
+  .finding-tag { font-size: 0.52rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--copper); margin-bottom: 4px; }
+  .finding-title { font-size: 0.82rem; color: var(--cream); margin-bottom: 3px; }
+  .finding-body { font-size: 0.68rem; color: var(--dim); line-height: 1.6; }
+  .test-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.72rem; color: var(--dim); border-bottom: 1px solid rgba(184,115,51,0.06); }
+  .test-item::before { content: '→'; color: var(--copper); }
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .plan-btn { padding: 12px 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 2px; color: var(--dim); font-family: 'Didact Gothic', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .plan-btn:hover { border-color: var(--copper); color: var(--cream); }
+  .plan-btn.active { background: rgba(184,115,51,0.12); border-color: var(--copper); color: var(--copper); }
+  .plan-price { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; display: block; margin-top: 4px; color: var(--cream); }
+  .msg-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px; padding: 10px 14px; color: var(--cream); font-family: 'Didact Gothic', sans-serif; font-size: 0.75rem; outline: none; resize: vertical; min-height: 80px; }
+  .msg-input:focus { border-color: var(--copper); }
+  .btn-send { padding: 10px 20px; background: var(--copper); border: none; color: var(--navy); font-family: 'Didact Gothic', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; border-radius: 1px; margin-top: 8px; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--dim); }
+  .empty-state p { font-size: 0.75rem; letter-spacing: 0.1em; }
+
+  /* LOADING */
+  .loading { text-align: center; padding: 40px; font-size: 0.7rem; color: var(--dim); letter-spacing: 0.2em; text-transform: uppercase; }
+
+  @media (max-width: 900px) {
+    :root { --sidebar: 0px; }
+    main { margin-left: 0; padding: 20px 16px 60px; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .detail-panel { width: 100%; right: -100%; }
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="sb-brand">
+    <a href="index.html" class="sb-logo">Revive</a>
+    <div class="sb-tag">Hormone Optimisation</div>
+  </div>
+  <div class="sb-badge">Clinician Portal</div>
+  <div class="sb-section">Patients</div>
+  <nav>
+    <a href="admin.html" class="active">All Patients</a>
+    <a href="#" onclick="filterPlan('Foundation')">Foundation Plan</a>
+    <a href="#" onclick="filterPlan('Performance')">Performance Plan</a>
+    <a href="#" onclick="filterPlan('Executive')">Executive Plan</a>
+    <a href="#" onclick="filterPlan(null)">No Plan Yet</a>
+  </nav>
+  <div class="sb-section">Tools</div>
+  <nav>
+    <a href="trt-calendar.html">Injection Tracker</a>
+    <a href="assessment.html">View Assessment</a>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-user-name" id="clinicianName">Clinician</div>
+    <div class="sb-user-role">Authorised Access</div>
+    <button class="btn-signout" onclick="handleSignOut()">Sign out →</button>
+  </div>
+</aside>
+
+<main>
+  <div class="page-head">
+    <div class="page-eyebrow">Clinician Panel</div>
+    <h1 class="page-title">Patient <em>Overview</em></h1>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Patients</div>
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-sub">Registered accounts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">On Programme</div>
+      <div class="stat-value" id="statOnPlan">—</div>
+      <div class="stat-sub">Active plan holders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Assessment Complete</div>
+      <div class="stat-value" id="statAssessed">—</div>
+      <div class="stat-sub">Have results on file</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Awaiting Plan</div>
+      <div class="stat-value" id="statNoPlan">—</div>
+      <div class="stat-sub">Assessed, no plan yet</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Patient List</div>
+    <div class="toolbar">
+      <input class="search-input" type="text" id="searchInput" placeholder="Search by name or email…" oninput="filterTable()">
+      <select class="filter-select" id="planFilter" onchange="filterTable()">
+        <option value="">All plans</option>
+        <option value="Foundation">Foundation</option>
+        <option value="Performance">Performance</option>
+        <option value="Executive">Executive</option>
+        <option value="none">No plan</option>
+      </select>
+      <select class="filter-select" id="pathFilter" onchange="filterTable()">
+        <option value="">All pathways</option>
+        <option value="trt">TRT (Male)</option>
+        <option value="hrt">HRT (Female)</option>
+      </select>
+    </div>
+    <div id="tableWrap">
+      <div class="loading">Loading patients…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Detail panel overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="dp-head">
+    <div>
+      <div class="dp-name" id="dpName">—</div>
+      <div class="dp-email" id="dpEmail">—</div>
+    </div>
+    <button class="dp-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="dp-body" id="dpBody"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain: "revive-clinic-885e7.firebaseapp.com",
+    projectId: "revive-clinic-885e7",
+    storageBucket: "revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId: "1075531492371",
+    appId: "1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let allPatients = [];
+
+  // Auth gate
+  onAuthStateChanged(auth, async user => {
+    if (!user) return window.location.href = 'admin-login.html';
+    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+    if (!adminDoc.exists()) {
+      await signOut(auth);
+      return window.location.href = 'admin-login.html';
+    }
+    document.getElementById('clinicianName').textContent = user.displayName || user.email;
+    loadPatients();
+  });
+
+  window.handleSignOut = async function() {
+    await signOut(auth);
+    window.location.href = 'admin-login.html';
+  };
+
+  async function loadPatients() {
+    const snap = await getDocs(collection(db, 'patients'));
+    allPatients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Stats
+    const onPlan   = allPatients.filter(p => p.plan).length;
+    const assessed = allPatients.filter(p => p.assessment).length;
+    const noPlan   = allPatients.filter(p => p.assessment && !p.plan).length;
+
+    document.getElementById('statTotal').textContent    = allPatients.length;
+    document.getElementById('statOnPlan').textContent   = onPlan;
+    document.getElementById('statAssessed').textContent = assessed;
+    document.getElementById('statNoPlan').textContent   = noPlan;
+
+    renderTable(allPatients);
+  }
+
+  function renderTable(patients) {
+    const wrap = document.getElementById('tableWrap');
+    if (!patients.length) {
+      wrap.innerHTML = '<div class="empty-state"><p>No patients found</p></div>';
+      return;
+    }
+
+    const rows = patients.map(p => {
+      const plan    = p.plan || 'none';
+      const path    = p.assessment?.path || '—';
+      const created = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleDateString('en-GB') : '—';
+      const findings = p.assessment?.findings || [];
+      const severity = findings.length ? findings[0]?.severity || '—' : '—';
+
+      const planBadge = plan !== 'none'
+        ? '<span class="badge badge-green">' + plan + '</span>'
+        : '<span class="badge badge-none">No plan</span>';
+
+      const pathLabel = path === 'trt' ? 'TRT — Male' : path === 'hrt' ? 'HRT — Female' : '—';
+
+      return '<tr onclick="openPatient(\'' + p.id + '\')">' +
+        '<td><div class="pt-name">' + (p.name||'—') + '</div><div class="pt-email">' + (p.email||'') + '</div></td>' +
+        '<td>' + pathLabel + '</td>' +
+        '<td>' + planBadge + '</td>' +
+        '<td>' + (findings.length ? findings.length + ' finding' + (findings.length>1?'s':'') : '—') + '</td>' +
+        '<td>' + created + '</td>' +
+        '</tr>';
+    }).join('');
+
+    wrap.innerHTML = '<table class="patient-table">' +
+      '<thead><tr><th>Patient</th><th>Pathway</th><th>Plan</th><th>Findings</th><th>Joined</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table>';
+  }
+
+  window.filterTable = function() {
+    const q    = document.getElementById('searchInput').value.toLowerCase();
+    const plan = document.getElementById('planFilter').value;
+    const path = document.getElementById('pathFilter').value;
+
+    const filtered = allPatients.filter(p => {
+      const matchQ    = !q || (p.name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q);
+      const matchPlan = !plan || (plan === 'none' ? !p.plan : p.plan === plan);
+      const matchPath = !path || p.assessment?.path === path;
+      return matchQ && matchPlan && matchPath;
+    });
+    renderTable(filtered);
+  };
+
+  window.filterPlan = function(plan) {
+    document.getElementById('planFilter').value = plan || '';
+    filterTable();
+  };
+
+  window.openPatient = async function(uid) {
+    const p = allPatients.find(x => x.id === uid);
+    if (!p) return;
+
+    document.getElementById('dpName').textContent  = p.name || '—';
+    document.getElementById('dpEmail').textContent = p.email || '—';
+
+    const findings = p.assessment?.findings || [];
+    const tests    = p.assessment?.tests    || [];
+    const path     = p.assessment?.path;
+    const plan     = p.plan || null;
+
+    const findingsHtml = findings.length
+      ? findings.map(f => '<div class="finding-item"><div class="finding-tag">' + f.tag + '</div><div class="finding-title">' + f.title + '</div><div class="finding-body">' + f.body + '</div></div>').join('')
+      : '<p style="font-size:0.72rem;color:var(--dim);">No assessment on file.</p>';
+
+    const testsHtml = tests.length
+      ? tests.map(t => '<div class="test-item">' + t + '</div>').join('')
+      : '<p style="font-size:0.72rem;color:var(--dim);">No tests recommended yet.</p>';
+
+    const plans = [
+      { key:'Foundation', price:'£149/mo' },
+      { key:'Performance', price:'£289/mo' },
+      { key:'Executive', price:'£549/mo' },
+    ];
+
+    const plansHtml = '<div class="plan-grid">' + plans.map(pl =>
+      '<button class="plan-btn' + (plan===pl.key?' active':'') + '" onclick="assignPlan(\'' + uid + '\',\'' + pl.key + '\')">' +
+      pl.key + '<span class="plan-price">' + pl.price + '</span></button>'
+    ).join('') + '</div>';
+
+    document.getElementById('dpBody').innerHTML =
+      '<div><div class="dp-section-title">Assessment Findings</div><div class="dp-card">' + findingsHtml + '</div></div>' +
+      '<div><div class="dp-section-title">Recommended Bloodwork</div><div class="dp-card">' + testsHtml + '</div></div>' +
+      '<div><div class="dp-section-title">Assign Programme</div>' + plansHtml + '</div>' +
+      '<div><div class="dp-section-title">Message Patient</div>' +
+      '<textarea class="msg-input" id="msgInput" placeholder="Write a message to ' + (p.name||'this patient') + '…"></textarea>' +
+      '<button class="btn-send" onclick="sendMsg(\'' + uid + '\')">Send Message</button></div>';
+
+    document.getElementById('detailOverlay').classList.add('open');
+    document.getElementById('detailPanel').classList.add('open');
+  };
+
+  window.closePanel = function() {
+    document.getElementById('detailOverlay').classList.remove('open');
+    document.getElementById('detailPanel').classList.remove('open');
+  };
+
+  window.assignPlan = async function(uid, plan) {
+    try {
+      await updateDoc(doc(db, 'patients', uid), { plan });
+      const p = allPatients.find(x => x.id === uid);
+      if (p) p.plan = plan;
+      // Refresh plan buttons
+      document.querySelectorAll('.plan-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.startsWith(plan));
+      });
+      // Refresh stats
+      const onPlan = allPatients.filter(p => p.plan).length;
+      const noPlan = allPatients.filter(p => p.assessment && !p.plan).length;
+      document.getElementById('statOnPlan').textContent = onPlan;
+      document.getElementById('statNoPlan').textContent = noPlan;
+    } catch(e) { console.error(e); }
+  };
+
+  window.sendMsg = async function(uid) {
+    const msg = document.getElementById('msgInput').value.trim();
+    if (!msg) return;
+    // Placeholder — wire to email/Firestore messages collection later
+    alert('Message queued for ' + uid + ' (email integration coming)');
+    document.getElementById('msgInput').value = '';
+  };
+</script>
+</body>
+</html>
