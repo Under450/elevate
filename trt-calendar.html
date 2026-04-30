@@ -248,18 +248,29 @@
   .check--anc2 { border-color: rgba(212, 116, 138, 0.35); background: var(--anc2-bg); }
   .check--anc3 { border-color: rgba(140, 196, 99, 0.35); background: var(--anc3-bg); }
   .check--anc4 { border-color: rgba(176, 124, 216, 0.35); background: var(--anc4-bg); }
+  .check--anc5 { border-color: rgba(232, 125, 74, 0.35); background: var(--anc5-bg); }
 
   .check.checked--inj { background: var(--inj-check); border-color: var(--inj); }
   .check.checked--anc1 { background: var(--anc1-check); border-color: var(--anc1); }
   .check.checked--anc2 { background: var(--anc2-check); border-color: var(--anc2); }
   .check.checked--anc3 { background: var(--anc3-check); border-color: var(--anc3); }
   .check.checked--anc4 { background: var(--anc4-check); border-color: var(--anc4); }
+  .check.checked--anc5 { background: var(--anc5-check); border-color: var(--anc5); }
 
   .check.checked--inj::after,
   .check.checked--anc1::after,
   .check.checked--anc2::after,
   .check.checked--anc3::after,
   .check.checked--anc4::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 2px;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+  .check.checked--anc5::after {
     content: '';
     position: absolute;
     left: 5px; top: 2px;
@@ -374,18 +385,29 @@
   .note-check__box--anc2 { border-color: rgba(212, 116, 138, 0.4); background: var(--anc2-bg); }
   .note-check__box--anc3 { border-color: rgba(140, 196, 99, 0.4); background: var(--anc3-bg); }
   .note-check__box--anc4 { border-color: rgba(176, 124, 216, 0.4); background: var(--anc4-bg); }
+  .note-check__box--anc5 { border-color: rgba(232, 125, 74, 0.4); background: var(--anc5-bg); }
 
   .note-check__box.checked--inj { background: var(--inj-check); border-color: var(--inj); }
   .note-check__box.checked--anc1 { background: var(--anc1-check); border-color: var(--anc1); }
   .note-check__box.checked--anc2 { background: var(--anc2-check); border-color: var(--anc2); }
   .note-check__box.checked--anc3 { background: var(--anc3-check); border-color: var(--anc3); }
   .note-check__box.checked--anc4 { background: var(--anc4-check); border-color: var(--anc4); }
+  .note-check__box.checked--anc5 { background: var(--anc5-check); border-color: var(--anc5); }
 
   .note-check__box.checked--inj::after,
   .note-check__box.checked--anc1::after,
   .note-check__box.checked--anc2::after,
   .note-check__box.checked--anc3::after,
   .note-check__box.checked--anc4::after {
+    content: '';
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .note-check__box.checked--anc5::after {
     content: '';
     position: absolute;
     left: 6px; top: 2px;
