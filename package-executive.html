@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — Executive Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#111d2b;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;--dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.22); }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--navy);color:var(--cream);font-family:'Didact Gothic',sans-serif;}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(17,29,43,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;letter-spacing:0.3em;color:var(--copper);text-transform:uppercase;text-decoration:none;}
+  .nav-back{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+  .nav-back:hover{color:var(--copper);}
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center;}
+  .plan-badge{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;}
+  .plan-name{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--cream);line-height:1;margin-bottom:16px;}
+  .plan-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,3vw,1.8rem);font-weight:300;color:var(--dim);margin-bottom:32px;line-height:1.4;}
+  .plan-tagline em{font-style:italic;color:var(--tan);}
+  .plan-price{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,4rem);color:var(--copper);margin-bottom:6px;}
+  .plan-price-sub{font-size:0.65rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:40px;}
+  .btn-cta{display:inline-block;padding:18px 56px;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.75rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.25s;text-decoration:none;margin-bottom:16px;}
+  .btn-cta:hover{background:var(--tan);transform:translateY(-2px);}
+  .btn-secondary{display:inline-block;padding:14px 40px;background:transparent;border:1px solid var(--line);color:var(--dim);font-family:'Didact Gothic',sans-serif;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;text-decoration:none;margin-left:12px;}
+  .btn-secondary:hover{border-color:var(--copper);color:var(--cream);}
+  .plan-desc{font-size:0.75rem;color:var(--dim);max-width:540px;line-height:1.8;margin:0 auto 0;}
+  .copper-line{height:1px;background:linear-gradient(90deg,transparent,var(--copper),transparent);opacity:0.25;margin:60px 0;}
+  .includes-section{max-width:820px;margin:0 auto;padding:0 24px 100px;}
+  .includes-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);text-align:center;margin-bottom:40px;}
+  .includes-title em{font-style:italic;color:var(--tan);}
+  .includes-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:40px;}
+  .include-item{background:rgba(22,32,48,0.6);border:1px solid var(--line);border-radius:2px;padding:20px;display:flex;gap:14px;align-items:flex-start;}
+  .include-tick{color:var(--copper);font-size:0.9rem;flex-shrink:0;margin-top:2px;}
+  .include-name{font-size:0.78rem;color:var(--cream);margin-bottom:4px;}
+  .include-desc{font-size:0.65rem;color:var(--dim);line-height:1.6;}
+  .not-include-item{background:rgba(17,24,36,0.4);border:1px solid rgba(184,115,51,0.08);border-radius:2px;padding:14px 16px;display:flex;gap:12px;align-items:center;font-size:0.72rem;color:var(--dim);}
+  .not-tick{color:rgba(251,243,218,0.2);flex-shrink:0;}
+  .compare-strip{background:rgba(184,115,51,0.06);border:1px solid var(--line);border-radius:2px;padding:28px 32px;text-align:center;margin-bottom:40px;}
+  .compare-strip p{font-size:0.72rem;color:var(--dim);line-height:1.8;margin-bottom:16px;}
+  .other-plans{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .plan-link{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);text-decoration:none;padding:8px 18px;border:1px solid var(--line);border-radius:1px;transition:all 0.2s;}
+  .plan-link:hover{border-color:var(--copper);color:var(--tan);}
+  @media(max-width:640px){.includes-grid{grid-template-columns:1fr;}header{padding:16px 20px;}.btn-secondary{margin-left:0;margin-top:8px;}}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="logo">Revive</a>
+  <a href="dashboard.html" class="nav-back">← Dashboard</a>
+</header>
+
+<div class="hero">
+  <div class="plan-badge">Hormone Optimisation — Executive Plan</div>
+  <div class="plan-name">Executive</div>
+  <div class="plan-tagline">The complete <em>concierge</em> experience</div>
+  <div class="plan-price">£549<span style="font-size:1.5rem;color:var(--dim);">/mo</span></div>
+  <div class="plan-price-sub">Billed monthly · Cancel anytime · UK clinicians</div>
+  <a href="signup.html" class="btn-cta">Start with Executive</a>
+  <a href="assessment.html" class="btn-secondary">Take Assessment First</a>
+  <div style="margin-top:32px;">
+    <p class="plan-desc">The Executive plan is our premium offering — unlimited access, same-day responses, full treatment suite, and a dedicated senior clinician managing every aspect of your health.</p>
+  </div>
+</div>
+
+<div class="copper-line"></div>
+
+<div class="includes-section">
+  <div class="includes-title">What's <em>included</em></div>
+  <div class="includes-grid"><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Everything in Performance</div><div class="include-desc">Full Performance plan benefits included</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Weekly blood monitoring option</div><div class="include-desc">Monitor as frequently as your protocol requires</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Dedicated senior clinician</div><div class="include-desc">Named senior doctor managing your case personally</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Same-day response guarantee</div><div class="include-desc">Messages answered within hours, not days</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Full treatment suite access</div><div class="include-desc">TRT/HRT, weight loss, sexual health, peptides, longevity — all included</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Branded PDF reports</div><div class="include-desc">Quarterly health reports with full biomarker analysis</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Private appointments</div><div class="include-desc">Direct booking with your clinician, no waiting list</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Family member pricing</div><div class="include-desc">20% discount for immediate family members</div></div></div><div class="include-item"><span class="include-tick">✓</span><div><div class="include-name">Annual longevity review</div><div class="include-desc">Comprehensive annual health optimisation review</div></div></div></div>
+  
+  <div class="copper-line"></div>
+  <div class="compare-strip">
+    <p>Compare other plans — all include access to the REVIVE patient dashboard, injection tracker, and clinician messaging.</p>
+    <div class="other-plans"><a href="package-foundation.html" class="plan-link">Foundation — £149/mo</a><a href="package-performance.html" class="plan-link">Performance — £289/mo</a><a href="assessment.html" class="plan-link">Take Assessment</a></div>
+  </div>
+  <div style="text-align:center;">
+    <a href="signup.html" class="btn-cta">Start with Executive — £549/mo</a>
+  </div>
+</div>
+</body>
+</html>
