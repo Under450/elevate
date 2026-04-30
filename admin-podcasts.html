@@ -9,129 +9,119 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy:   #0d1520;
-    --navy2:  #111d2b;
-    --cream:  #fbf3da;
-    --copper: #b87333;
-    --tan:    #bd9468;
-    --dim:    rgba(251,243,218,0.45);
-    --line:   rgba(184,115,51,0.2);
-    --sidebar:220px;
-    --green:  #3cb371;
+    --navy:#0d1520;--navy2:#111d2b;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;
+    --dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.2);--sidebar:220px;--green:#3cb371;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; background: var(--navy2); color: var(--cream); font-family: 'Didact Gothic', sans-serif; overflow-x: hidden; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy2);color:var(--cream);font-family:'Didact Gothic',sans-serif;overflow-x:hidden;}
+  aside{width:var(--sidebar);min-height:100vh;background:#0a1018;border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:0 0 24px;}
+  .sb-brand{padding:24px 20px;border-bottom:1px solid var(--line);}
+  .sb-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;letter-spacing:0.3em;color:var(--copper);text-transform:uppercase;text-decoration:none;display:block;}
+  .sb-tag{font-size:0.5rem;letter-spacing:0.35em;color:var(--dim);text-transform:uppercase;margin-top:3px;}
+  .sb-badge{margin:12px 20px 0;background:rgba(184,115,51,0.1);border:1px solid var(--line);border-radius:1px;padding:4px 10px;font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);text-align:center;}
+  .sb-section{font-size:0.48rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);padding:18px 20px 6px;opacity:0.7;}
+  nav a{display:flex;align-items:center;gap:9px;padding:9px 20px;font-size:0.7rem;color:var(--dim);text-decoration:none;letter-spacing:0.07em;transition:all 0.2s;position:relative;}
+  nav a:hover{color:var(--cream);background:rgba(184,115,51,0.06);}
+  nav a.active{color:var(--cream);background:rgba(184,115,51,0.1);}
+  nav a.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--copper);}
+  .sb-user{margin-top:auto;padding:16px 20px;border-top:1px solid var(--line);}
+  .sb-user-name{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--cream);}
+  .sb-user-role{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);}
+  .btn-signout{margin-top:8px;font-size:0.58rem;color:var(--dim);background:none;border:none;cursor:pointer;letter-spacing:0.1em;padding:0;}
+  .btn-signout:hover{color:var(--cream);}
+  main{margin-left:var(--sidebar);padding:36px 36px 80px;}
+  .page-eyebrow{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;}
+  .page-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:32px;}
+  .page-title em{font-style:italic;color:var(--tan);}
 
-  /* SIDEBAR */
-  aside { width: var(--sidebar); min-height: 100vh; background: #0a1018; border-right: 1px solid var(--line); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 50; padding: 0 0 24px; }
-  .sb-brand { padding: 24px 20px; border-bottom: 1px solid var(--line); }
-  .sb-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; letter-spacing: 0.3em; color: var(--copper); text-transform: uppercase; text-decoration: none; display: block; }
-  .sb-tag  { font-size: 0.5rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-top: 3px; }
-  .sb-badge { margin: 12px 20px 0; background: rgba(184,115,51,0.1); border: 1px solid var(--line); border-radius: 1px; padding: 4px 10px; font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--copper); text-align: center; }
-  .sb-section { font-size: 0.48rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); padding: 18px 20px 6px; opacity: 0.7; }
-  nav a { display: flex; align-items: center; gap: 9px; padding: 9px 20px; font-size: 0.7rem; color: var(--dim); text-decoration: none; letter-spacing: 0.07em; transition: all 0.2s; position: relative; }
-  nav a:hover { color: var(--cream); background: rgba(184,115,51,0.06); }
-  nav a.active { color: var(--cream); background: rgba(184,115,51,0.1); }
-  nav a.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--copper); }
-  .sb-user { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--line); }
-  .sb-user-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); }
-  .sb-user-role { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--copper); }
-  .btn-signout { margin-top: 8px; font-size: 0.58rem; color: var(--dim); background: none; border: none; cursor: pointer; letter-spacing: 0.1em; padding: 0; }
-  .btn-signout:hover { color: var(--cream); }
-
-  /* MAIN */
-  main { margin-left: var(--sidebar); padding: 36px 36px 80px; }
-  .page-head { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
-  .page-eyebrow { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 6px; }
-  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--cream); }
-  .page-title em { font-style: italic; color: var(--tan); }
-
-  /* TABS */
-  .tabs { display: flex; gap: 2px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
-  .tab { padding: 10px 20px; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
-  .tab:hover { color: var(--cream); }
-  .tab.active { color: var(--copper); border-bottom-color: var(--copper); }
-
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  /* STAGE TABS */
+  .stages{display:flex;gap:2px;margin-bottom:28px;border-bottom:1px solid var(--line);}
+  .stage-tab{padding:10px 20px;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+  .stage-tab:hover{color:var(--cream);}
+  .stage-tab.active{color:var(--copper);border-bottom-color:var(--copper);}
+  .stage-badge{font-size:0.45rem;background:rgba(184,115,51,0.15);border:1px solid var(--line);padding:2px 6px;border-radius:1px;letter-spacing:0.15em;}
+  .stage-panel{display:none;}
+  .stage-panel.active{display:block;}
 
   /* CARDS */
-  .card { background: rgba(17,29,43,0.8); border: 1px solid var(--line); border-radius: 2px; padding: 28px; margin-bottom: 20px; }
-  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--cream); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-  .card-sub { font-size: 0.68rem; color: var(--dim); line-height: 1.7; margin-bottom: 16px; }
+  .card{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:24px;margin-bottom:20px;}
+  .card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--cream);margin-bottom:6px;}
+  .card-sub{font-size:0.68rem;color:var(--dim);line-height:1.7;margin-bottom:16px;}
 
-  /* FORM */
-  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-  .field label { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); }
-  .field input, .field select, .field textarea {
-    background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 2px;
-    padding: 12px 14px; color: var(--cream); font-family: 'Didact Gothic', sans-serif;
-    font-size: 0.78rem; outline: none; transition: border-color 0.2s; width: 100%;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--copper); }
-  .field input::placeholder, .field textarea::placeholder { color: rgba(251,243,218,0.2); }
-  .field select option { background: #111d2b; }
-  .field textarea { resize: vertical; min-height: 160px; }
-
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  /* SEARCH */
+  .search-row{display:flex;gap:10px;margin-bottom:12px;}
+  .search-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:13px 16px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+  .search-input:focus{border-color:var(--copper);}
+  .search-input::placeholder{color:rgba(251,243,218,0.2);}
+  .search-hint{font-size:0.62rem;color:var(--dim);line-height:1.6;letter-spacing:0.05em;}
 
   /* BUTTONS */
-  .btn { padding: 12px 24px; font-family: 'Didact Gothic', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border-radius: 1px; transition: all 0.2s; border: none; }
-  .btn-primary { background: var(--copper); color: var(--navy); }
-  .btn-primary:hover { background: var(--tan); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--dim); }
-  .btn-outline:hover { border-color: var(--copper); color: var(--cream); }
-  .btn-green { background: rgba(60,179,113,0.15); border: 1px solid rgba(60,179,113,0.35); color: var(--green); }
-  .btn-green:hover { background: rgba(60,179,113,0.25); }
-  .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  .btn{padding:12px 24px;font-family:'Didact Gothic',sans-serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;border:none;}
+  .btn-primary{background:var(--copper);color:var(--navy);}
+  .btn-primary:hover{background:var(--tan);}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--dim);}
+  .btn-outline:hover{border-color:var(--copper);color:var(--cream);}
+  .btn-sm{padding:7px 14px;font-size:0.58rem;}
+  .btn-green{background:rgba(60,179,113,0.15);border:1px solid rgba(60,179,113,0.35);color:var(--green);}
+  .btn-green:hover{background:rgba(60,179,113,0.25);}
+  .btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;}
 
-  /* SCRIPT OUTPUT */
-  .script-wrap {
-    background: rgba(10,16,24,0.9); border: 1px solid var(--line); border-radius: 2px;
-    padding: 24px; font-size: 0.78rem; line-height: 1.9; color: var(--cream);
-    white-space: pre-wrap; max-height: 520px; overflow-y: auto; margin-bottom: 16px;
-    font-family: 'Didact Gothic', sans-serif;
-  }
-  .script-wrap:focus { outline: none; border-color: var(--copper); }
+  /* RESULT CARDS */
+  .result-card{background:rgba(12,20,32,0.9);border:1px solid var(--line);border-radius:2px;padding:20px;margin-bottom:12px;transition:border-color 0.2s;}
+  .result-card:hover{border-color:rgba(184,115,51,0.4);}
+  .result-source{font-size:0.48rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;}
+  .result-title{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--cream);line-height:1.3;margin-bottom:6px;}
+  .result-authors{font-size:0.62rem;color:var(--tan);margin-bottom:6px;line-height:1.4;}
+  .result-meta{font-size:0.6rem;color:var(--dim);margin-bottom:10px;letter-spacing:0.05em;}
+  .result-abstract{font-size:0.7rem;color:var(--dim);line-height:1.65;margin-bottom:12px;max-height:100px;overflow:hidden;mask-image:linear-gradient(to bottom,black 60%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,black 60%,transparent 100%);}
+  .result-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* FORM */
+  .field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+  .field label{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--dim);}
+  .field input,.field select,.field textarea{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:11px 14px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.78rem;outline:none;transition:border-color 0.2s;width:100%;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--copper);}
+  .field input::placeholder,.field textarea::placeholder{color:rgba(251,243,218,0.2);}
+  .field select option{background:#111d2b;}
+  .field textarea{resize:vertical;min-height:140px;}
+  .field-hint{font-size:0.58rem;color:var(--dim);letter-spacing:0.05em;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  /* SCRIPT */
+  .script-box{background:rgba(8,14,22,0.95);border:1px solid var(--line);border-radius:2px;padding:24px;font-size:0.78rem;line-height:1.9;color:var(--cream);white-space:pre-wrap;min-height:300px;outline:none;margin-bottom:14px;font-family:'Didact Gothic',sans-serif;}
+  .script-box:focus{border-color:var(--copper);}
+  .script-box[contenteditable="true"]{cursor:text;}
 
   /* STATUS */
-  .status-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 2px; font-size: 0.7rem; margin-bottom: 16px; }
-  .status-generating { background: rgba(184,115,51,0.1); border: 1px solid rgba(184,115,51,0.3); color: var(--tan); }
-  .status-done       { background: rgba(60,179,113,0.1); border: 1px solid rgba(60,179,113,0.3); color: var(--green); }
-  .status-error      { background: rgba(224,53,53,0.1);  border: 1px solid rgba(224,53,53,0.3);  color: #e05555; }
-  .spinner { width: 14px; height: 14px; border: 2px solid rgba(184,115,51,0.3); border-top-color: var(--copper); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .status{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:2px;font-size:0.7rem;margin-bottom:16px;}
+  .status-gen{background:rgba(184,115,51,0.1);border:1px solid rgba(184,115,51,0.3);color:var(--tan);}
+  .status-ok {background:rgba(60,179,113,0.1);border:1px solid rgba(60,179,113,0.3);color:var(--green);}
+  .status-err{background:rgba(224,53,53,0.1);border:1px solid rgba(224,53,53,0.3);color:#e05555;}
+  .spinner{width:13px;height:13px;border:2px solid rgba(184,115,51,0.3);border-top-color:var(--copper);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* SECTION LABEL */
-  .section-label { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--copper); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
-  .section-label::after { content:''; flex:1; height:1px; background:var(--line); }
+  /* LIBRARY */
+  .section-label{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--line);}
+  .pod-item{background:rgba(17,29,43,0.7);border:1px solid var(--line);border-radius:2px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+  .pod-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .pod-dot.published{background:var(--green);}
+  .pod-dot.draft{background:var(--copper);}
+  .pod-info{flex:1;}
+  .pod-title{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--cream);margin-bottom:3px;}
+  .pod-meta{font-size:0.6rem;color:var(--dim);letter-spacing:0.07em;}
+  .pod-badge{font-size:0.48rem;letter-spacing:0.2em;text-transform:uppercase;padding:3px 8px;border-radius:1px;flex-shrink:0;}
+  .pod-badge.published{background:rgba(60,179,113,0.12);color:var(--green);border:1px solid rgba(60,179,113,0.25);}
+  .pod-badge.draft{background:rgba(184,115,51,0.1);color:var(--tan);border:1px solid var(--line);}
+  .pod-btn{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;padding:5px 10px;border-radius:1px;cursor:pointer;font-family:'Didact Gothic',sans-serif;border:1px solid rgba(60,179,113,0.35);background:transparent;color:var(--green);transition:all 0.2s;}
+  .pod-btn:hover{background:rgba(60,179,113,0.1);}
+  .empty{text-align:center;padding:40px;color:var(--dim);font-size:0.72rem;letter-spacing:0.1em;}
 
-  /* PODCAST LIST */
-  .podcast-list { display: flex; flex-direction: column; gap: 12px; }
-  .podcast-item { background: rgba(17,29,43,0.7); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; }
-  .podcast-item:hover { border-color: rgba(184,115,51,0.4); }
-  .pod-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .pod-status.published { background: var(--green); }
-  .pod-status.draft { background: var(--copper); }
-  .pod-info { flex: 1; }
-  .pod-title { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--cream); margin-bottom: 3px; }
-  .pod-meta { font-size: 0.6rem; color: var(--dim); letter-spacing: 0.08em; }
-  .pod-badge { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: 1px; flex-shrink: 0; }
-  .pod-badge.published { background: rgba(60,179,113,0.12); color: var(--green); border: 1px solid rgba(60,179,113,0.25); }
-  .pod-badge.draft { background: rgba(184,115,51,0.12); color: var(--tan); border: 1px solid var(--line); }
-  .pod-actions { display: flex; gap: 8px; }
-  .pod-btn { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 5px 12px; border-radius: 1px; cursor: pointer; font-family: 'Didact Gothic', sans-serif; border: 1px solid var(--line); background: transparent; color: var(--dim); transition: all 0.2s; }
-  .pod-btn:hover { border-color: var(--copper); color: var(--cream); }
-  .pod-btn.publish { border-color: rgba(60,179,113,0.4); color: var(--green); }
-  .pod-btn.publish:hover { background: rgba(60,179,113,0.1); }
-
-  .empty { text-align: center; padding: 48px 20px; color: var(--dim); font-size: 0.72rem; letter-spacing: 0.1em; }
-
-  @media (max-width: 900px) {
-    :root { --sidebar: 0px; }
-    main { margin-left: 0; padding: 20px 16px 60px; }
-    .field-row { grid-template-columns: 1fr; }
+  @media(max-width:900px){
+    :root{--sidebar:0px;}
+    main{margin-left:0;padding:20px 16px 60px;}
+    .field-row{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -144,13 +134,9 @@
   </div>
   <div class="sb-badge">Clinician Portal</div>
   <div class="sb-section">Patients</div>
-  <nav>
-    <a href="admin.html">All Patients</a>
-  </nav>
+  <nav><a href="admin.html">All Patients</a></nav>
   <div class="sb-section">Content</div>
-  <nav>
-    <a href="admin-podcasts.html" class="active">Podcast Creator</a>
-  </nav>
+  <nav><a href="admin-podcasts.html" class="active">Podcast Creator</a></nav>
   <div class="sb-section">Tools</div>
   <nav>
     <a href="trt-calendar.html">Injection Tracker</a>
@@ -164,67 +150,114 @@
 </aside>
 
 <main>
-  <div class="page-head">
-    <div>
-      <div class="page-eyebrow">Content Studio</div>
-      <h1 class="page-title">Podcast <em>Creator</em></h1>
+  <div class="page-eyebrow">Content Studio</div>
+  <h1 class="page-title">Podcast <em>Creator</em></h1>
+
+  <div class="stages">
+    <div class="stage-tab active" onclick="goStage(1)">
+      <span>1 — Search Studies</span><span class="stage-badge">PubMed + S2</span>
+    </div>
+    <div class="stage-tab" onclick="goStage(2)">
+      <span>2 — Import &amp; Save</span><span class="stage-badge">Stage 1A</span>
+    </div>
+    <div class="stage-tab" onclick="goStage(3)">
+      <span>3 — Generate Script</span><span class="stage-badge">Claude AI</span>
+    </div>
+    <div class="stage-tab" onclick="goStage(4)">
+      <span>4 — Review &amp; Publish</span><span class="stage-badge">Inner Circle</span>
+    </div>
+    <div class="stage-tab" onclick="goStage(5)">
+      <span>Library</span>
     </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('create')">Create New</div>
-    <div class="tab" onclick="switchTab('library')">Published Library</div>
-    <div class="tab" onclick="switchTab('drafts')">Drafts</div>
+  <!-- STAGE 1: SEARCH -->
+  <div class="stage-panel active" id="stage-1">
+    <div class="card">
+      <div class="card-title">Search PubMed &amp; Semantic Scholar</div>
+      <p class="card-sub">Enter a keyword or topic — e.g. "PSA Vitamin C" or "testosterone cardiovascular outcomes". Results are pulled live from both databases simultaneously.</p>
+      <div class="search-row">
+        <input class="search-input" type="text" id="searchQ" placeholder="e.g. testosterone vitamin D deficiency…" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="btn btn-primary" onclick="doSearch()" id="searchBtn">Search Databases</button>
+      </div>
+      <p class="search-hint">Searches PubMed and Semantic Scholar simultaneously. Click <strong>Import</strong> on any result to pre-fill the study form.</p>
+    </div>
+    <div id="searchStatus" style="display:none;"></div>
+    <div id="searchResults"></div>
   </div>
 
-  <!-- CREATE TAB -->
-  <div class="tab-panel active" id="tab-create">
-
+  <!-- STAGE 2: IMPORT & SAVE -->
+  <div class="stage-panel" id="stage-2">
     <div class="card">
-      <div class="card-title">Step 1 — Upload Study</div>
-      <p class="card-sub">Paste the clinical study text, abstract, or key findings below. Claude will convert it into an engaging podcast script for your patients.</p>
+      <div class="card-title">Study Details</div>
+      <p class="card-sub">Review and complete the study details. Fields pre-filled from search results — edit as needed before saving.</p>
+
+      <div class="field">
+        <label>Study Title *</label>
+        <input type="text" id="fTitle" placeholder="Effects of testosterone therapy on cardiovascular outcomes…">
+      </div>
 
       <div class="field-row">
         <div class="field">
-          <label>Episode Title</label>
-          <input type="text" id="episodeTitle" placeholder="e.g. TRT and Cardiovascular Health — 2026 Review">
-        </div>
-        <div class="field">
           <label>Category</label>
-          <select id="episodeCategory">
+          <select id="fCategory">
             <option value="trt">TRT — Male Hormone Therapy</option>
             <option value="hrt">HRT — Female Hormone Therapy</option>
-            <option value="longevity">Longevity & Healthspan</option>
+            <option value="longevity">Longevity &amp; Healthspan</option>
             <option value="sexual-health">Sexual Health</option>
-            <option value="weight-loss">Weight Loss & Metabolism</option>
-            <option value="nutrition">Nutrition & Lifestyle</option>
+            <option value="weight-loss">Weight Loss &amp; Metabolism</option>
+            <option value="nutrition">Nutrition &amp; Lifestyle</option>
             <option value="general">General Hormone Health</option>
           </select>
         </div>
+        <div class="field">
+          <label>Source (DOI or URL)</label>
+          <input type="text" id="fDoi" placeholder="10.1016/j.jnufbio.2009.06.004">
+        </div>
       </div>
 
       <div class="field">
-        <label>Study / Source (DOI, URL, or reference)</label>
-        <input type="text" id="studySource" placeholder="e.g. DOI: 10.1016/j.jnufbio.2009.06.004 or paste URL">
+        <label>Study Text / Abstract *</label>
+        <textarea id="fText" placeholder="Paste the abstract, full text, or key findings…" style="min-height:180px;"></textarea>
+        <div class="field-hint">Minimum 100 characters. More detail = richer podcast script.</div>
       </div>
 
       <div class="field">
-        <label>Study Text or Abstract</label>
-        <textarea id="studyText" placeholder="Paste the full study text, abstract, or key findings here. The more detail you provide, the richer the podcast script will be.&#10;&#10;You can also summarise key points in plain language and Claude will structure them into a podcast episode."></textarea>
+        <label>Formatted Citation (optional)</label>
+        <input type="text" id="fCitation" placeholder="Smith J, et al. Title. Journal. 2023;1(2):34-45. DOI: …">
       </div>
+
+      <div class="field">
+        <label>Admin Notes (internal only)</label>
+        <textarea id="fNotes" placeholder="Angle for the script, context, audience notes…" style="min-height:70px;"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveStudy()">Save Study &amp; Continue to Script →</button>
+        <button class="btn btn-outline" onclick="goStage(1)">← Back to Search</button>
+      </div>
+    </div>
+    <div id="saveStatus" style="display:none;"></div>
+  </div>
+
+  <!-- STAGE 3: GENERATE SCRIPT -->
+  <div class="stage-panel" id="stage-3">
+    <div class="card">
+      <div class="card-title">Generate Podcast Script</div>
+      <p class="card-sub">Claude will convert the clinical study into an engaging podcast script for your patients.</p>
 
       <div class="field-row">
         <div class="field">
           <label>Target Audience</label>
-          <select id="targetAudience">
-            <option value="patient">Patients (accessible language)</option>
-            <option value="clinician">Clinicians (technical)</option>
+          <select id="fAudience">
+            <option value="patient">Patients — accessible language</option>
+            <option value="clinician">Clinicians — technical</option>
             <option value="both">Mixed audience</option>
           </select>
         </div>
         <div class="field">
           <label>Episode Length</label>
-          <select id="episodeLength">
+          <select id="fLength">
             <option value="short">Short (5–8 min)</option>
             <option value="medium" selected>Medium (10–15 min)</option>
             <option value="long">Long (20–25 min)</option>
@@ -233,45 +266,46 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn btn-primary" id="generateBtn" onclick="generateScript()">Generate Podcast Script</button>
-        <span style="font-size:0.62rem;color:var(--dim);">Powered by Claude AI</span>
+        <button class="btn btn-primary" id="genBtn" onclick="generateScript()">Generate Script with Claude AI</button>
+        <button class="btn btn-outline" onclick="goStage(2)">← Back to Study</button>
       </div>
     </div>
-
-    <!-- STATUS -->
-    <div id="statusBar" style="display:none;"></div>
-
-    <!-- SCRIPT OUTPUT -->
+    <div id="genStatus" style="display:none;"></div>
     <div id="scriptSection" style="display:none;">
       <div class="card">
-        <div class="card-title">Step 2 — Review & Edit Script</div>
-        <p class="card-sub">Review the generated script below. Click to edit directly. When ready, publish to the patient Inner Circle.</p>
-        <div class="section-label">Generated Script</div>
-        <div class="script-wrap" id="scriptOutput" contenteditable="true"></div>
+        <div class="card-title">Generated Script — Click to Edit</div>
+        <div class="script-box" id="scriptBox" contenteditable="true"></div>
         <div class="btn-row">
-          <button class="btn btn-green" onclick="publishPodcast()">Publish to Inner Circle</button>
-          <button class="btn btn-outline" onclick="saveDraft()">Save as Draft</button>
+          <button class="btn btn-primary" onclick="goStage(4)">Review &amp; Publish →</button>
           <button class="btn btn-outline" onclick="regenerate()">Regenerate</button>
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- LIBRARY TAB -->
-  <div class="tab-panel" id="tab-library">
+  <!-- STAGE 4: REVIEW & PUBLISH -->
+  <div class="stage-panel" id="stage-4">
+    <div class="card">
+      <div class="card-title">Review &amp; Publish to Inner Circle</div>
+      <p class="card-sub">Final check before publishing. Once published, patients can read this episode in their dashboard Inner Circle.</p>
+      <div id="reviewTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);margin-bottom:8px;"></div>
+      <div id="reviewMeta" style="font-size:0.65rem;color:var(--dim);margin-bottom:20px;"></div>
+      <div class="script-box" id="reviewScript" style="max-height:400px;overflow-y:auto;"></div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="publish()">Publish to Inner Circle</button>
+        <button class="btn btn-outline" onclick="saveDraft()">Save as Draft</button>
+        <button class="btn btn-outline" onclick="goStage(3)">← Edit Script</button>
+      </div>
+      <div id="publishStatus" style="display:none;margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- STAGE 5: LIBRARY -->
+  <div class="stage-panel" id="stage-5">
     <div class="section-label">Published Episodes</div>
-    <div class="podcast-list" id="publishedList">
-      <div class="empty">Loading published episodes…</div>
-    </div>
-  </div>
-
-  <!-- DRAFTS TAB -->
-  <div class="tab-panel" id="tab-drafts">
-    <div class="section-label">Draft Episodes</div>
-    <div class="podcast-list" id="draftList">
-      <div class="empty">Loading drafts…</div>
-    </div>
+    <div id="publishedList"><div class="empty">Loading…</div></div>
+    <div class="section-label" style="margin-top:24px;">Drafts</div>
+    <div id="draftList"><div class="empty">Loading…</div></div>
   </div>
 
 </main>
@@ -279,84 +313,258 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
-    authDomain: "revive-clinic-885e7.firebaseapp.com",
-    projectId: "revive-clinic-885e7",
-    storageBucket: "revive-clinic-885e7.firebasestorage.app",
-    messagingSenderId: "1075531492371",
-    appId: "1:1075531492371:web:64ef54b11f47401be063e6"
+    apiKey:"AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain:"revive-clinic-885e7.firebaseapp.com",
+    projectId:"revive-clinic-885e7",
+    storageBucket:"revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId:"1075531492371",
+    appId:"1:1075531492371:web:64ef54b11f47401be063e6"
   };
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
-
   let currentUser = null;
-  let currentDocId = null;
 
-  // Auth gate
-  onAuthStateChanged(auth, async user => {
+  onAuthStateChanged(auth, user => {
     if (!user) return window.location.href = 'admin-login.html';
     currentUser = user;
     document.getElementById('clinicianName').textContent = user.displayName || user.email;
-    loadPodcasts();
+    loadLibrary();
   });
 
   window.handleSignOut = async () => { await signOut(auth); window.location.href = 'admin-login.html'; };
 
-  // ── TAB SWITCHING ──
-  window.switchTab = function(tab) {
-    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['create','library','drafts'][i] === tab));
-    document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', ['tab-create','tab-library','tab-drafts'][i] === 'tab-'+tab));
+  // ── STAGE NAV ──
+  window.goStage = function(n) {
+    document.querySelectorAll('.stage-tab').forEach((t,i) => t.classList.toggle('active', i+1 === n));
+    document.querySelectorAll('.stage-panel').forEach((p,i) => p.classList.toggle('active', i+1 === n));
+    if (n === 4) prefillReview();
+    if (n === 5) loadLibrary();
   };
 
-  // ── GENERATE SCRIPT ──
-  window.generateScript = async function() {
-    const title    = document.getElementById('episodeTitle').value.trim();
-    const text     = document.getElementById('studyText').value.trim();
-    const source   = document.getElementById('studySource').value.trim();
-    const audience = document.getElementById('targetAudience').value;
-    const length   = document.getElementById('episodeLength').value;
-    const category = document.getElementById('episodeCategory').value;
+  // ── STATUS HELPERS ──
+  function showStatus(elId, type, msg) {
+    const el = document.getElementById(elId);
+    el.style.display = 'flex';
+    el.className = 'status status-' + type;
+    el.innerHTML = (type==='gen' ? '<div class="spinner"></div> ' : type==='ok' ? '✓ ' : '✕ ') + msg;
+  }
 
-    if (!title) return showStatus('error', 'Please enter an episode title.');
-    if (!text)  return showStatus('error', 'Please paste the study text or abstract.');
-
-    const btn = document.getElementById('generateBtn');
+  // ── STAGE 1: SEARCH ──
+  window.doSearch = async function() {
+    const q = document.getElementById('searchQ').value.trim();
+    if (q.length < 3) return;
+    const btn = document.getElementById('searchBtn');
     btn.disabled = true;
-    showStatus('generating', 'Claude is generating your podcast script…');
+    btn.textContent = 'Searching…';
+    showStatus('searchStatus', 'gen', 'Searching PubMed and Semantic Scholar…');
+    document.getElementById('searchResults').innerHTML = '';
+
+    const [s2, pm] = await Promise.allSettled([
+      searchSemanticScholar(q),
+      searchPubMed(q)
+    ]);
+
+    let results = [];
+    if (s2.status === 'fulfilled') results.push(...s2.value.map(r => ({...r, src:'Semantic Scholar'})));
+    if (pm.status === 'fulfilled') results.push(...pm.value.map(r => ({...r, src:'PubMed'})));
+
+    // Deduplicate by DOI
+    const seen = new Set();
+    results = results.filter(r => {
+      if (!r.doi) return true;
+      const k = r.doi.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Search Databases';
+
+    if (!results.length) {
+      showStatus('searchStatus', 'err', 'No results found. Try different keywords.');
+      return;
+    }
+
+    showStatus('searchStatus', 'ok', results.length + ' results from PubMed + Semantic Scholar');
+    renderResults(results);
+  };
+
+  async function searchSemanticScholar(q) {
+    const url = 'https://api.semanticscholar.org/graph/v1/paper/search?query=' +
+      encodeURIComponent(q) + '&limit=8&fields=title,authors,abstract,externalIds,year,url';
+    const r = await fetch(url, { headers: { 'User-Agent': 'REVIVE-Clinic/1.0' }, signal: AbortSignal.timeout(10000) });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return (j.data || []).filter(p => p.title && p.abstract).map(p => ({
+      title: p.title,
+      authors: (p.authors||[]).map(a=>a.name).join(', '),
+      abstract: p.abstract,
+      doi: p.externalIds?.DOI || null,
+      year: p.year || null,
+      url: p.url || null,
+    }));
+  }
+
+  async function searchPubMed(q) {
+    // Step 1: get IDs
+    const sUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=' +
+      encodeURIComponent(q) + '&retmax=8&retmode=json';
+    const sr = await fetch(sUrl, { signal: AbortSignal.timeout(10000) });
+    if (!sr.ok) return [];
+    const sj = await sr.json();
+    const ids = sj.esearchresult?.idlist || [];
+    if (!ids.length) return [];
+
+    // Step 2: summaries
+    const dUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' +
+      ids.join(',') + '&retmode=json';
+    const dr = await fetch(dUrl, { signal: AbortSignal.timeout(10000) });
+    if (!dr.ok) return [];
+    const dj = await dr.json();
+
+    // Step 3: abstracts XML
+    const aUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=' +
+      ids.join(',') + '&rettype=abstract&retmode=xml';
+    let abstractMap = {};
+    try {
+      const ar = await fetch(aUrl, { signal: AbortSignal.timeout(10000) });
+      if (ar.ok) abstractMap = parseAbstractXml(await ar.text());
+    } catch(e) {}
+
+    return ids.map(id => {
+      const item = dj.result?.[id];
+      if (!item || !item.title) return null;
+      const doi = (item.articleids||[]).find(a=>a.idtype==='doi')?.value || null;
+      return {
+        title: item.title,
+        authors: (item.authors||[]).map(a=>a.name).join(', '),
+        abstract: abstractMap[id] || '',
+        doi,
+        year: item.pubdate ? parseInt(item.pubdate)||null : null,
+        url: 'https://pubmed.ncbi.nlm.nih.gov/' + id + '/',
+      };
+    }).filter(Boolean);
+  }
+
+  function parseAbstractXml(xml) {
+    const map = {};
+    xml.split('<PubmedArticle>').forEach(art => {
+      const pmid = art.match(/<PMID[^>]*>(\d+)<\/PMID>/)?.[1];
+      const abs  = art.match(/<AbstractText[^>]*>([\s\S]*?)<\/AbstractText>/g);
+      if (pmid && abs) map[pmid] = abs.map(m => m.replace(/<[^>]+>/g,'').trim()).join(' ');
+    });
+    return map;
+  }
+
+  function renderResults(results) {
+    const wrap = document.getElementById('searchResults');
+    wrap.innerHTML = results.map((r,i) => {
+      const authors = (r.authors||'').length > 180 ? r.authors.slice(0,180)+'…' : (r.authors||'');
+      const doiLink = r.doi ? '<a href="https://doi.org/'+r.doi+'" target="_blank" style="color:var(--copper)">'+r.doi+'</a>' : '';
+      return '<div class="result-card">' +
+        '<div class="result-source">' + r.src + (r.year ? ' · ' + r.year : '') + '</div>' +
+        '<div class="result-title">' + r.title + '</div>' +
+        (authors ? '<div class="result-authors">' + authors + '</div>' : '') +
+        '<div class="result-meta">' + (doiLink||'') + (r.url && !r.doi ? '<a href="'+r.url+'" target="_blank" style="color:var(--copper)">View →</a>' : '') + '</div>' +
+        (r.abstract ? '<div class="result-abstract">' + r.abstract + '</div>' : '') +
+        '<div class="result-actions">' +
+          '<button class="btn btn-primary btn-sm" onclick="importResult(' + i + ')">Import Study</button>' +
+          (r.url ? '<a href="'+r.url+'" target="_blank"><button class="btn btn-outline btn-sm">View Original ↗</button></a>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    window._searchResults = results;
+  }
+
+  window.importResult = function(i) {
+    const r = window._searchResults[i];
+    document.getElementById('fTitle').value    = r.title || '';
+    document.getElementById('fText').value     = r.abstract || '';
+    document.getElementById('fDoi').value      = r.doi || (r.url||'');
+    // Build citation
+    const parts = [];
+    if (r.authors) parts.push(r.authors);
+    parts.push(r.title);
+    if (r.year) parts.push('(' + r.year + ')');
+    if (r.doi) parts.push('DOI: ' + r.doi);
+    document.getElementById('fCitation').value = parts.join('. ') + '.';
+    goStage(2);
+    showStatus('saveStatus', 'ok', 'Study imported from ' + r.src + '. Review details then save.');
+  };
+
+  // ── STAGE 2: SAVE STUDY ──
+  window.saveStudy = async function() {
+    const title = document.getElementById('fTitle').value.trim();
+    const text  = document.getElementById('fText').value.trim();
+    if (!title) return showStatus('saveStatus', 'err', 'Please enter a title.');
+    if (text.length < 100) return showStatus('saveStatus', 'err', 'Study text must be at least 100 characters.');
+    showStatus('saveStatus', 'gen', 'Saving study…');
+    // Store in memory (Firestore studies collection optional — script generation works from memory)
+    window._currentStudy = {
+      title, text,
+      doi:      document.getElementById('fDoi').value.trim(),
+      citation: document.getElementById('fCitation').value.trim(),
+      notes:    document.getElementById('fNotes').value.trim(),
+      category: document.getElementById('fCategory').value,
+    };
+    showStatus('saveStatus', 'ok', 'Study saved. Continuing to script generation…');
+    setTimeout(() => goStage(3), 800);
+  };
+
+  // ── STAGE 3: GENERATE SCRIPT ──
+  window.generateScript = async function() {
+    const study = window._currentStudy;
+    if (!study) return showStatus('genStatus', 'err', 'No study loaded. Go back to Stage 2.');
+    const audience = document.getElementById('fAudience').value;
+    const length   = document.getElementById('fLength').value;
+    const btn = document.getElementById('genBtn');
+    btn.disabled = true;
     document.getElementById('scriptSection').style.display = 'none';
+    showStatus('genStatus', 'gen', 'Claude is generating the podcast script from the clinical study…');
 
-    const lengthMap = { short: '5–8 minutes', medium: '10–15 minutes', long: '20–25 minutes' };
-    const audienceMap = { patient: 'patients (use accessible, encouraging language — avoid heavy jargon)', clinician: 'clinicians (technical, precise)', both: 'a mixed audience of patients and clinicians' };
+    const lengthMap   = { short:'5–8 minutes', medium:'10–15 minutes', long:'20–25 minutes' };
+    const audienceMap = {
+      patient:  'patients (use accessible, encouraging language — no heavy jargon)',
+      clinician:'clinicians (technical, precise, cite values and statistics)',
+      both:     'a mixed audience of patients and clinicians'
+    };
 
-    const prompt = `You are a medical podcast scriptwriter for REVIVE, a premium hormone optimisation clinic in the UK.
+    const prompt = `You are a medical podcast scriptwriter for REVIVE, a premium UK hormone optimisation clinic (TRT and HRT).
 
-Convert the following clinical study into an engaging podcast script titled: "${title}"
+Convert this clinical study into an engaging podcast episode titled: "${study.title}"
 
 Target audience: ${audienceMap[audience]}
 Episode length: ${lengthMap[length]}
-Category: ${category}
-${source ? 'Source: ' + source : ''}
+Category: ${study.category}
+${study.citation ? 'Citation: ' + study.citation : ''}
+${study.doi ? 'Source: ' + study.doi : ''}
 
-STUDY CONTENT:
-${text}
+STUDY TEXT:
+${study.text}
 
-Write a complete podcast script with:
-1. A warm, professional opening (introduce the episode and what listeners will learn)
-2. Background context (why this topic matters for hormone health)
-3. Key findings from the study (explain clearly, use real numbers from the study)
-4. What this means for patients on TRT or HRT
-5. Clinical takeaways and practical implications
-6. A closing summary with a call to action (consult your clinician, log your symptoms, etc.)
+Write a complete, spoken-word podcast script with:
 
-Format the script with clear section headers. Write it as spoken word — natural, authoritative, and engaging. Do not include music cues or production notes.`;
+**OPENING** — Warm, professional welcome. Introduce the episode and exactly what listeners will learn.
+
+**BACKGROUND** — Why this topic matters for hormone health and for the listener specifically.
+
+**THE STUDY** — Walk through the key findings clearly. Use real numbers from the study. Explain what the researchers found and how robust the evidence is.
+
+**WHAT THIS MEANS FOR YOU** — Translate findings into practical meaning for someone on TRT or HRT. What should they watch for, ask their clinician about, or be encouraged by?
+
+**CLINICAL TAKEAWAYS** — 3–5 concrete, actionable points a patient or clinician can take away.
+
+**CLOSING** — Warm summary and call to action (track symptoms, discuss with clinician at next appointment, log results in the REVIVE dashboard).
+
+Write as natural spoken word — authoritative, warm, and engaging. No music cues or production notes. Use clear section headers.`;
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -365,138 +573,109 @@ Format the script with clear section headers. Write it as spoken word — natura
           messages: [{ role: 'user', content: prompt }]
         })
       });
-
-      const data = await response.json();
+      const data = await res.json();
       const script = data.content?.[0]?.text || '';
+      if (!script) throw new Error('Empty response');
 
-      if (!script) throw new Error('No script returned');
-
-      document.getElementById('scriptOutput').textContent = script;
+      window._currentScript = script;
+      document.getElementById('scriptBox').textContent = script;
       document.getElementById('scriptSection').style.display = 'block';
-      showStatus('done', 'Script generated. Review and edit below, then publish to the Inner Circle.');
-
-      // Store metadata for publish/draft
-      window._podcastMeta = { title, source, category, audience, length, studyText: text, script };
-
+      showStatus('genStatus', 'ok', 'Script generated. Review and edit below, then continue to publish.');
     } catch(e) {
-      showStatus('error', 'Generation failed: ' + e.message);
+      showStatus('genStatus', 'err', 'Generation failed: ' + e.message);
     }
-
     btn.disabled = false;
   };
 
   window.regenerate = function() {
     document.getElementById('scriptSection').style.display = 'none';
-    window.generateScript();
+    generateScript();
   };
 
-  // ── PUBLISH ──
-  window.publishPodcast = async function() {
-    const meta   = window._podcastMeta;
-    const script = document.getElementById('scriptOutput').textContent;
-    if (!meta || !script) return;
+  // ── STAGE 4: REVIEW ──
+  function prefillReview() {
+    const study  = window._currentStudy || {};
+    const script = document.getElementById('scriptBox')?.textContent || window._currentScript || '';
+    document.getElementById('reviewTitle').textContent  = study.title || '—';
+    document.getElementById('reviewMeta').textContent   = (study.category||'') + (study.citation ? ' · ' + study.citation : '');
+    document.getElementById('reviewScript').textContent = script;
+    window._currentScript = script; // sync edits
+  }
 
+  window.publish = async function() {
+    const study  = window._currentStudy;
+    const script = document.getElementById('scriptBox')?.textContent || window._currentScript;
+    if (!study || !script) return;
+    showStatus('publishStatus', 'gen', 'Publishing to Inner Circle…');
     try {
-      const ref = await addDoc(collection(db, 'podcasts'), {
-        title:       meta.title,
-        source:      meta.source,
-        category:    meta.category,
-        audience:    meta.audience,
-        length:      meta.length,
-        studyText:   meta.studyText,
+      await addDoc(collection(db, 'podcasts'), {
+        title:       study.title,
+        source:      study.doi || '',
+        citation:    study.citation || '',
+        category:    study.category,
+        studyText:   study.text,
         script,
         status:      'published',
-        createdBy:   currentUser.email,
+        createdBy:   currentUser?.email || '',
         createdAt:   serverTimestamp(),
         publishedAt: serverTimestamp(),
       });
-      currentDocId = ref.id;
-      showStatus('done', '✓ Published to the Inner Circle. Patients can now access this episode.');
-      loadPodcasts();
+      showStatus('publishStatus', 'ok', '✓ Published. Patients can now access this episode in the Inner Circle.');
+      setTimeout(() => goStage(5), 1500);
     } catch(e) {
-      showStatus('error', 'Publish failed: ' + e.message);
+      showStatus('publishStatus', 'err', 'Publish failed: ' + e.message);
     }
   };
 
-  // ── SAVE DRAFT ──
   window.saveDraft = async function() {
-    const meta   = window._podcastMeta;
-    const script = document.getElementById('scriptOutput').textContent;
-    if (!meta || !script) return;
-
+    const study  = window._currentStudy;
+    const script = document.getElementById('scriptBox')?.textContent || window._currentScript;
+    if (!study || !script) return;
     try {
       await addDoc(collection(db, 'podcasts'), {
-        title:     meta.title,
-        source:    meta.source,
-        category:  meta.category,
-        audience:  meta.audience,
-        length:    meta.length,
-        studyText: meta.studyText,
-        script,
-        status:    'draft',
-        createdBy: currentUser.email,
-        createdAt: serverTimestamp(),
+        title: study.title, source: study.doi||'', citation: study.citation||'',
+        category: study.category, studyText: study.text, script,
+        status: 'draft', createdBy: currentUser?.email||'', createdAt: serverTimestamp(),
       });
-      showStatus('done', '✓ Saved as draft.');
-      loadPodcasts();
+      showStatus('publishStatus', 'ok', 'Saved as draft.');
     } catch(e) {
-      showStatus('error', 'Save failed: ' + e.message);
+      showStatus('publishStatus', 'err', 'Save failed: ' + e.message);
     }
   };
 
-  // ── LOAD PODCASTS ──
-  async function loadPodcasts() {
+  // ── LIBRARY ──
+  async function loadLibrary() {
     try {
       const snap = await getDocs(collection(db, 'podcasts'));
-      const all  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      const published = all.filter(p => p.status === 'published');
-      const drafts    = all.filter(p => p.status === 'draft');
-
-      renderList('publishedList', published, 'published');
-      renderList('draftList', drafts, 'draft');
-    } catch(e) {
-      console.error(e);
-    }
+      const all  = snap.docs.map(d => ({id:d.id,...d.data()}));
+      renderList('publishedList', all.filter(p=>p.status==='published'), 'published');
+      renderList('draftList',    all.filter(p=>p.status==='draft'),     'draft');
+    } catch(e) { console.error(e); }
   }
 
   function renderList(elId, items, type) {
     const el = document.getElementById(elId);
-    if (!items.length) {
-      el.innerHTML = '<div class="empty">No ' + (type === 'published' ? 'published episodes' : 'drafts') + ' yet.</div>';
-      return;
-    }
+    if (!items.length) { el.innerHTML = '<div class="empty">None yet.</div>'; return; }
+    const cats = {trt:'TRT',hrt:'HRT',longevity:'Longevity','sexual-health':'Sexual Health','weight-loss':'Weight Loss',nutrition:'Nutrition',general:'General'};
     el.innerHTML = items.map(p => {
       const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') :
-                   p.createdAt?.toDate  ? p.createdAt.toDate().toLocaleDateString('en-GB')   : '—';
-      const catLabel = { trt:'TRT', hrt:'HRT', longevity:'Longevity', 'sexual-health':'Sexual Health', 'weight-loss':'Weight Loss', nutrition:'Nutrition', general:'General' }[p.category] || p.category;
-      return '<div class="podcast-item">' +
-        '<div class="pod-status ' + type + '"></div>' +
-        '<div class="pod-info">' +
-          '<div class="pod-title">' + p.title + '</div>' +
-          '<div class="pod-meta">' + catLabel + ' · ' + date + (p.createdBy ? ' · ' + p.createdBy : '') + '</div>' +
-        '</div>' +
+                   p.createdAt?.toDate   ? p.createdAt.toDate().toLocaleDateString('en-GB') : '—';
+      return '<div class="pod-item">' +
+        '<div class="pod-dot ' + type + '"></div>' +
+        '<div class="pod-info"><div class="pod-title">' + p.title + '</div>' +
+        '<div class="pod-meta">' + (cats[p.category]||p.category||'—') + ' · ' + date + '</div></div>' +
         '<span class="pod-badge ' + type + '">' + type + '</span>' +
-        (type === 'draft' ? '<button class="pod-btn publish" onclick="publishExisting(\'' + p.id + '\')">Publish</button>' : '') +
+        (type==='draft' ? '<button class="pod-btn" onclick="publishExisting(\'' + p.id + '\')">Publish</button>' : '') +
         '</div>';
     }).join('');
   }
 
   window.publishExisting = async function(id) {
-    try {
-      await updateDoc(doc(db, 'podcasts', id), { status: 'published', publishedAt: serverTimestamp() });
-      loadPodcasts();
-    } catch(e) { console.error(e); }
+    await updateDoc(doc(db, 'podcasts', id), { status:'published', publishedAt:serverTimestamp() });
+    loadLibrary();
   };
 
-  // ── STATUS ──
-  function showStatus(type, msg) {
-    const el = document.getElementById('statusBar');
-    el.style.display = 'flex';
-    const icons = { generating: '<div class="spinner"></div>', done: '✓', error: '✕' };
-    el.className = 'status-bar status-' + type;
-    el.innerHTML = icons[type] + ' ' + msg;
-  }
+  window.doSearch  = window.doSearch;
 </script>
 </body>
 </html>
