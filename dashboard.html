@@ -753,9 +753,13 @@
     <div class="page-head">
       <div>
         <div class="page-eyebrow">Patient Portal</div>
-        <h1 class="page-title">Good morning, <em>James</em></h1>
+        <h1 class="page-title">Good morning, <em id="patientGreeting">—</em></h1>
+        <div style="font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--dim);margin-top:6px;" id="protocolStatus">Loading protocol status…</div>
       </div>
-      <div class="date-tag" id="dateTag"></div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="date-tag" id="dateTag"></div>
+        <button style="padding:10px 22px;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;" onclick="alert('Booking system coming soon.')">Book Consultation</button>
+      </div>
     </div>
 
     <!-- ALERTS -->
@@ -768,18 +772,57 @@
 
     <!-- INJECTION + CLINICIAN -->
     <div class="dashboard-section">
-      <div class="section-label">Next Dose</div>
-      <div class="injection-card">
-        <div class="inj-countdown">
-          <div class="inj-days" id="injDays">3</div>
-          <div class="inj-days-label">days</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+        <div>
+          <div class="section-label">Next Injection</div>
+          <div class="injection-card" style="flex-direction:column;gap:16px;padding:24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);">Cypionate · 100mg</span>
+              <button class="inj-btn" onclick="this.textContent='✓ Logged'" style="padding:8px 16px;font-size:0.6rem;">Log Injection</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:20px;">
+              <div class="inj-countdown" style="flex-shrink:0;">
+                <div class="inj-days">Mon</div>
+                <div class="inj-days-label">In 3 days</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;">
+                  <span style="color:var(--dim);letter-spacing:0.1em;">SITE</span>
+                  <span style="color:var(--cream);">Left quad</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;">
+                  <span style="color:var(--dim);letter-spacing:0.1em;">FREQUENCY</span>
+                  <span style="color:var(--cream);">Twice weekly</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;">
+                  <span style="color:var(--dim);letter-spacing:0.1em;">VIAL</span>
+                  <span style="color:var(--cream);">14 doses remaining</span>
+                </div>
+              </div>
+            </div>
+            <a href="https://under450.github.io/elevate/trt-calendar.html" style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);text-decoration:none;">View Injection Tracker →</a>
+          </div>
         </div>
-        <div class="inj-divider"></div>
-        <div class="inj-info">
-          <div class="inj-drug">Testosterone Cypionate</div>
-          <div class="inj-dose">100mg / 0.5ml · IM injection · Monday & Thursday</div>
+
+        <div>
+          <div class="section-label">Your Clinician</div>
+          <div class="card" style="display:flex;flex-direction:column;gap:16px;height:calc(100% - 33px);">
+            <div class="clinician-card">
+              <div class="clinician-avatar">DW</div>
+              <div style="flex:1;">
+                <div class="clinician-name">Dr. David Williams</div>
+                <div class="clinician-role">TRT Specialist · GMC 7654321</div>
+              </div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3cb371;flex-shrink:0;" title="Online"></div>
+            </div>
+            <div class="msg-input-row">
+              <input class="msg-input" type="text" placeholder="Send a secure message…">
+              <button class="msg-send">Send</button>
+            </div>
+          </div>
         </div>
-        <button class="inj-btn" onclick="this.textContent='✓ Logged'">Log Dose</button>
+
       </div>
     </div>
 
@@ -870,43 +913,43 @@
       <div class="grid-2">
 
         <div>
-          <div class="section-label">Treatment Suite</div>
+          <div class="section-label">Explore Treatments</div>
           <div class="treatment-grid">
             <div class="treatment-tile active">
-              <div class="tt-cat">Core</div>
-              <div class="tt-name">TRT Protocol</div>
-              <div class="tt-sub">Active testosterone replacement</div>
-              <span class="tt-badge">Active</span>
+              <div class="tt-cat">Active · Core</div>
+              <div class="tt-name">Testosterone</div>
+              <div class="tt-sub">Cypionate, enanthate, cream or pellets. Clinician-led protocols built around your labs.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">On Protocol →</span>
+            </div>
+            <div class="treatment-tile" onclick="window.location.href='assessment.html'">
+              <div class="tt-cat">Available</div>
+              <div class="tt-name">Weight Loss</div>
+              <div class="tt-sub">Semaglutide and tirzepatide. Medically supervised, titrated to your metabolism.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">Take Assessment →</span>
+            </div>
+            <div class="treatment-tile" onclick="window.location.href='assessment.html'">
+              <div class="tt-cat">Available</div>
+              <div class="tt-name">Sexual Health</div>
+              <div class="tt-sub">ED treatment, PT-141, Trimix. Discreet delivery, clinician-prescribed.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">Take Assessment →</span>
             </div>
             <div class="treatment-tile">
-              <div class="tt-cat">Weight Loss</div>
-              <div class="tt-name">Semaglutide</div>
-              <div class="tt-sub">GLP-1 appetite regulation</div>
-              <span class="tt-badge">Add On</span>
+              <div class="tt-cat">Available</div>
+              <div class="tt-name">Peptides</div>
+              <div class="tt-sub">Sermorelin, ipamorelin, BPC-157. Recovery, sleep and growth hormone support.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">Explore →</span>
             </div>
             <div class="treatment-tile">
-              <div class="tt-cat">Sexual Health</div>
-              <div class="tt-name">Tadalafil</div>
-              <div class="tt-sub">Daily low-dose ED support</div>
-              <span class="tt-badge">Add On</span>
+              <div class="tt-cat">Available</div>
+              <div class="tt-name">Longevity</div>
+              <div class="tt-sub">NAD+ infusions, glutathione, advanced biomarker panels and healthspan coaching.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">Explore →</span>
             </div>
             <div class="treatment-tile">
-              <div class="tt-cat">Longevity</div>
-              <div class="tt-name">NAD+ IV</div>
-              <div class="tt-sub">Cellular energy & repair</div>
-              <span class="tt-badge">Add On</span>
-            </div>
-            <div class="treatment-tile">
-              <div class="tt-cat">Hair & Skin</div>
-              <div class="tt-name">Finasteride</div>
-              <div class="tt-sub">DHT inhibition protocol</div>
-              <span class="tt-badge">Add On</span>
-            </div>
-            <div class="treatment-tile">
-              <div class="tt-cat">Peptides</div>
-              <div class="tt-name">BPC-157</div>
-              <div class="tt-sub">Healing & recovery peptide</div>
-              <span class="tt-badge">Add On</span>
+              <div class="tt-cat">Available</div>
+              <div class="tt-name">Hair &amp; Skin</div>
+              <div class="tt-sub">Finasteride, minoxidil, topical treatments. Because how you look matters too.</div>
+              <span class="tt-badge" style="position:static;margin-top:8px;display:inline-block;">Explore →</span>
             </div>
           </div>
         </div>
@@ -916,27 +959,31 @@
           <div class="card" style="padding:16px 20px;">
             <div class="rx-item">
               <div class="rx-bar-wrap">
-                <div class="rx-name">Testosterone Cypionate</div>
-                <div class="rx-bar-track"><div class="rx-bar" style="width:60%"></div></div>
-                <div class="rx-days">~18 days remaining</div>
+                <div class="rx-name">Testosterone Cypionate 200mg/mL</div>
+                <div class="rx-days">Next refill 12 May</div>
               </div>
-              <button class="rx-refill">Reorder</button>
+              <button class="rx-refill">Reorder →</button>
             </div>
             <div class="rx-item">
               <div class="rx-bar-wrap">
                 <div class="rx-name">Anastrozole 0.25mg</div>
-                <div class="rx-bar-track"><div class="rx-bar" style="width:35%"></div></div>
-                <div class="rx-days">~10 days remaining</div>
+                <div class="rx-days">28 tablets remaining</div>
               </div>
-              <button class="rx-refill">Reorder</button>
+              <button class="rx-refill">In Stock</button>
             </div>
             <div class="rx-item">
               <div class="rx-bar-wrap">
                 <div class="rx-name">HCG 500 IU</div>
-                <div class="rx-bar-track"><div class="rx-bar" style="width:80%"></div></div>
-                <div class="rx-days">~24 days remaining</div>
+                <div class="rx-days">Ships with next order</div>
               </div>
-              <button class="rx-refill">Reorder</button>
+              <button class="rx-refill">Bundled</button>
+            </div>
+            <div class="rx-item">
+              <div class="rx-bar-wrap">
+                <div class="rx-name">Syringes &amp; Sharps Bin</div>
+                <div class="rx-days">Ships with next order</div>
+              </div>
+              <button class="rx-refill">Bundled</button>
             </div>
           </div>
         </div>
@@ -944,20 +991,36 @@
       </div>
     </div>
 
-    <!-- CLINICIAN MESSAGE -->
+    <!-- LIBRARY -->
     <div class="dashboard-section">
-      <div class="section-label">My Clinician</div>
+      <div class="section-label">The Library</div>
       <div class="card">
-        <div class="clinician-card">
-          <div class="clinician-avatar">DW</div>
-          <div>
-            <div class="clinician-name">Dr. David Williams</div>
-            <div class="clinician-role">TRT Specialist · GMC 7654321</div>
-          </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--cream);">Journal &amp; Resources</div>
+          <span style="font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);background:rgba(184,115,51,0.1);border:1px solid var(--line);padding:3px 8px;border-radius:1px;">Journal</span>
         </div>
-        <div class="msg-input-row">
-          <input class="msg-input" type="text" placeholder="Message your clinician...">
-          <button class="msg-send">Send</button>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;cursor:pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            <div>
+              <div style="font-size:0.78rem;color:var(--cream);line-height:1.4;margin-bottom:4px;">The honest TRT timeline: what changes at week 2, 6 and 12</div>
+              <div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.08em;">Dr Williams · 6 min read</div>
+            </div>
+            <span style="font-size:0.6rem;color:var(--copper);white-space:nowrap;">Read →</span>
+          </div>
+          <div style="padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;cursor:pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            <div>
+              <div style="font-size:0.78rem;color:var(--cream);line-height:1.4;margin-bottom:4px;">Why haematocrit matters more than you think</div>
+              <div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.08em;">Clinical team · 4 min read</div>
+            </div>
+            <span style="font-size:0.6rem;color:var(--copper);white-space:nowrap;">Read →</span>
+          </div>
+          <div style="padding:14px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;cursor:pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            <div>
+              <div style="font-size:0.78rem;color:var(--cream);line-height:1.4;margin-bottom:4px;">Stacking peptides with TRT: what's worth it</div>
+              <div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.08em;">Podcast · 32 min</div>
+            </div>
+            <span style="font-size:0.6rem;color:var(--copper);white-space:nowrap;">Listen →</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1016,6 +1079,14 @@
     const firstName = (user.displayName || user.email || '').split(' ')[0];
     const nameEl = document.getElementById('patientGreeting');
     if (nameEl) nameEl.textContent = firstName;
+
+    // Protocol status line
+    const statusEl = document.getElementById('protocolStatus');
+    if (statusEl) {
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
+      statusEl.textContent = 'Week 14 · Protocol On Track';
+    }
 
     const emailEl = document.getElementById('patientEmail');
     if (emailEl) emailEl.textContent = user.email;
