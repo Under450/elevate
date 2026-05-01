@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — My Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#111d2b;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;--dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.22);--sidebar:240px;--green:#3cb371;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--navy);color:var(--cream);font-family:'Didact Gothic',sans-serif;min-height:100%;}
+  aside{width:var(--sidebar);min-height:100vh;background:#0a1018;border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:0 0 32px;}
+  .sb-brand{padding:28px 24px;border-bottom:1px solid var(--line);}
+  .sb-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;letter-spacing:0.3em;color:var(--copper);text-transform:uppercase;text-decoration:none;display:block;}
+  .sb-tag{font-size:0.52rem;letter-spacing:0.3em;color:var(--dim);text-transform:uppercase;margin-top:4px;}
+  .sb-section{font-size:0.48rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);padding:20px 24px 6px;opacity:0.7;}
+  nav a{display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:0.72rem;color:var(--dim);text-decoration:none;letter-spacing:0.08em;transition:all 0.2s;position:relative;}
+  nav a:hover{color:var(--cream);background:rgba(184,115,51,0.06);}
+  nav a.active{color:var(--cream);background:rgba(184,115,51,0.1);}
+  nav a.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--copper);}
+  .sb-user{margin-top:auto;padding:20px 24px;border-top:1px solid var(--line);}
+  .sb-user-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--cream);margin-bottom:2px;}
+  .sb-user-plan{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);}
+  .btn-signout{margin-top:8px;font-size:0.58rem;color:var(--dim);background:none;border:none;cursor:pointer;letter-spacing:0.1em;padding:0;}
+  .btn-signout:hover{color:var(--cream);}
+  main{margin-left:var(--sidebar);padding:48px 48px 80px;}
+  .page-eyebrow{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:8px;}
+  .page-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--cream);margin-bottom:8px;}
+  .page-title em{font-style:italic;color:var(--tan);}
+  .page-sub{font-size:0.72rem;color:var(--dim);line-height:1.7;margin-bottom:36px;}
+  .section-label{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  /* STATUS BANNER */
+  .status-banner{border-radius:2px;padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .sb-active{background:rgba(60,179,113,0.08);border:1px solid rgba(60,179,113,0.25);}
+  .sb-paused{background:rgba(196,136,58,0.08);border:1px solid rgba(196,136,58,0.25);}
+  .sb-pending{background:rgba(184,115,51,0.08);border:1px solid rgba(184,115,51,0.2);}
+  .sb-label{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:4px;}
+  .sb-active .sb-label{color:var(--green);}
+  .sb-paused .sb-label{color:#e8a855;}
+  .sb-pending .sb-label{color:var(--tan);}
+  .sb-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);}
+  .sb-meta{font-size:0.65rem;color:var(--dim);letter-spacing:0.08em;}
+  .btn-msg{padding:10px 22px;background:transparent;border:1px solid var(--line);color:var(--dim);font-family:'Didact Gothic',sans-serif;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;}
+  .btn-msg:hover{border-color:var(--copper);color:var(--cream);}
+
+  /* MED CARDS */
+  .med-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:36px;}
+  .med-card{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:24px;position:relative;overflow:hidden;}
+  .med-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--copper);}
+  .med-route-badge{position:absolute;top:16px;right:16px;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;padding:3px 8px;border-radius:1px;background:rgba(184,115,51,0.12);color:var(--tan);border:1px solid var(--line);}
+  .med-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:var(--cream);margin-bottom:14px;padding-right:60px;}
+  .med-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .md-item{}
+  .md-label{font-size:0.5rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;}
+  .md-value{font-size:0.82rem;color:var(--cream);}
+  .med-divider{height:1px;background:var(--line);margin-bottom:14px;}
+  .med-what{font-size:0.7rem;color:var(--dim);line-height:1.75;margin-bottom:10px;}
+  .med-why{background:rgba(184,115,51,0.06);border-left:2px solid var(--copper);padding:10px 14px;font-size:0.68rem;color:var(--dim);line-height:1.7;border-radius:0 2px 2px 0;}
+  .med-history{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;}
+  .dose-old{font-size:0.58rem;background:rgba(184,115,51,0.08);color:rgba(184,115,51,0.45);padding:2px 7px;border-radius:1px;text-decoration:line-through;}
+  .dose-new{font-size:0.58rem;background:rgba(184,115,51,0.18);color:var(--copper);padding:2px 7px;border-radius:1px;}
+  .dose-date{font-size:0.58rem;color:rgba(251,243,218,0.25);}
+
+  /* GUIDE CARDS */
+  .guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+  .guide-card{background:rgba(17,29,43,0.6);border:1px solid var(--line);border-radius:2px;padding:20px;cursor:pointer;transition:border-color 0.2s;}
+  .guide-card:hover{border-color:rgba(184,115,51,0.4);}
+  .guide-icon{font-size:1.4rem;margin-bottom:10px;}
+  .guide-title{font-size:0.75rem;color:var(--cream);margin-bottom:5px;}
+  .guide-sub{font-size:0.65rem;color:var(--dim);line-height:1.6;}
+  .guide-link{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);margin-top:10px;display:block;}
+
+  /* EMPTY */
+  .empty-state{text-align:center;padding:64px 32px;border:1px dashed var(--line);border-radius:2px;}
+  .empty-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--cream);margin-bottom:10px;}
+  .empty-sub{font-size:0.72rem;color:var(--dim);line-height:1.7;max-width:400px;margin:0 auto 20px;}
+  .btn-book{padding:12px 32px;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;}
+
+  /* MED DESCRIPTIONS */
+  .med-descriptions{display:none;}
+
+  @media(max-width:900px){:root{--sidebar:0px;}main{margin-left:0;padding:20px 16px 60px;}.guide-grid{grid-template-columns:1fr;}.med-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="sb-brand">
+    <a href="dashboard.html" class="sb-logo">Revive</a>
+    <div class="sb-tag">Hormone Optimisation</div>
+  </div>
+  <div class="sb-section">Patient</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="assessment.html">My Assessment</a>
+    <a href="my-protocol.html" class="active">My Protocol</a>
+    <a href="labs.html">Labs &amp; Biomarkers</a>
+    <a href="appointments.html">Appointments</a>
+    <a href="https://under450.github.io/elevate/trt-calendar.html">Injection Tracker</a>
+    <a href="inner-circle.html">Inner Circle</a>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-user-name" id="userName">—</div>
+    <div class="sb-user-plan" id="userPlan">Patient</div>
+    <button class="btn-signout" onclick="handleSignOut()">Sign out →</button>
+  </div>
+</aside>
+
+<main>
+  <div class="page-eyebrow">Clinical Care</div>
+  <h1 class="page-title">My <em>Protocol</em></h1>
+  <p class="page-sub" id="pageSubtitle">Your personalised hormone optimisation prescription — built by your clinician based on your blood results and assessment.</p>
+
+  <div id="protocolContent">
+    <div class="empty-state">
+      <div class="empty-title">No protocol assigned yet</div>
+      <p class="empty-sub">Your clinician will build your personalised prescription after your initial consultation and blood results review.</p>
+      <button class="btn-book" onclick="window.location.href='appointments.html'">Book Your Consultation</button>
+    </div>
+  </div>
+
+  <div id="guideSection" style="display:none;">
+    <div class="section-label">Guides &amp; Resources</div>
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="guide-icon">💉</div>
+        <div class="guide-title">How to inject testosterone</div>
+        <div class="guide-sub">Step-by-step intramuscular injection guide. Site rotation, preparation, and aftercare.</div>
+        <a class="guide-link" href="#">Watch Guide →</a>
+      </div>
+      <div class="guide-card">
+        <div class="guide-icon">📅</div>
+        <div class="guide-title">Logging your doses</div>
+        <div class="guide-sub">How to use the injection tracker to log every dose and track your schedule.</div>
+        <a class="guide-link" href="https://under450.github.io/elevate/trt-calendar.html">Open Tracker →</a>
+      </div>
+      <div class="guide-card">
+        <div class="guide-icon">🩸</div>
+        <div class="guide-title">When to get bloods</div>
+        <div class="guide-sub">Timing your blood tests correctly around your injections for accurate readings.</div>
+        <a class="guide-link" href="labs.html">Upload Results →</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, collection, getDocs, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain:"revive-clinic-885e7.firebaseapp.com",
+    projectId:"revive-clinic-885e7",
+    storageBucket:"revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId:"1075531492371",
+    appId:"1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // What each medication is and why — patient-friendly descriptions
+  const MED_INFO = {
+    'Testosterone Cypionate': {
+      what: 'Testosterone Cypionate is a long-acting form of testosterone delivered by intramuscular injection. It replaces the testosterone your body is not producing at optimal levels, restoring energy, mood, libido, and muscle function.',
+      why: 'Your blood results showed testosterone levels below the optimal range for your age and symptoms. Injectable cypionate provides stable, predictable levels with twice-weekly dosing.'
+    },
+    'Testosterone Enanthate': {
+      what: 'Testosterone Enanthate is a long-acting injectable testosterone ester, similar to Cypionate but with a slightly longer half-life. It is injected weekly or twice weekly into muscle.',
+      why: 'Prescribed based on your testosterone deficiency assessment and blood panel results.'
+    },
+    'Anastrozole': {
+      what: 'Anastrozole is an aromatase inhibitor — it reduces the conversion of testosterone to oestrogen. On TRT, some testosterone converts to oestrogen, which can cause side effects at high levels.',
+      why: 'Added to your protocol because your Estradiol (E2) reading was elevated. Anastrozole keeps oestrogen in the optimal range, preventing water retention and mood changes.'
+    },
+    'HCG': {
+      what: 'HCG (Human Chorionic Gonadotropin) mimics LH — the hormone that signals your testes to produce testosterone and maintain size and fertility. While on TRT, your own LH production is suppressed.',
+      why: 'Included to preserve testicular function and fertility while you are on testosterone replacement therapy.'
+    },
+    'Raloxifene': {
+      what: 'Raloxifene is a Selective Estrogen Receptor Modulator (SERM) that blocks oestrogen receptors in breast tissue. It is used to prevent or treat gynaecomastia (breast tissue growth).',
+      why: 'Added as a precaution or treatment to manage oestrogen-related side effects in breast tissue.'
+    },
+    'Oestradiol Patch': {
+      what: 'The oestradiol patch delivers a steady, low dose of oestrogen through the skin. It is the most physiological method of HRT delivery, avoiding the liver first-pass effect.',
+      why: 'Prescribed to replace oestrogen lost during perimenopause or menopause, reducing hot flushes, sleep disturbance, and protecting bone density.'
+    },
+    'Utrogestan': {
+      what: 'Utrogestan is body-identical micronised progesterone derived from plants. It is taken orally at night and is the safest form of progesterone for women on HRT.',
+      why: 'Essential alongside oestrogen to protect the womb lining. Also improves sleep quality and mood.'
+    },
+    'Semaglutide': {
+      what: 'Semaglutide is a GLP-1 receptor agonist — it mimics a gut hormone that regulates appetite and blood sugar. It is injected weekly and causes significant weight loss in most patients.',
+      why: 'Prescribed as part of a medically supervised weight loss programme to support metabolic health alongside your hormone protocol.'
+    },
+    'Tadalafil': {
+      what: 'Tadalafil (Cialis) is a PDE5 inhibitor that improves blood flow. At the low daily dose, it treats erectile dysfunction and also has cardiovascular benefits.',
+      why: 'Prescribed at a low daily dose for erectile function support alongside your TRT protocol.'
+    },
+    'Vitamin D3/K2': {
+      what: 'Vitamin D3 supports testosterone production, immune function, bone density, and mood. K2 directs calcium into bones and away from arteries. Most UK adults are deficient.',
+      why: 'Your Vitamin D level was below the optimal range. Supplementation supports your hormone optimisation and overall health.'
+    },
+  };
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) return window.location.href = 'login.html';
+    document.getElementById('userName').textContent = user.displayName || user.email;
+
+    try {
+      const snap = await getDocs(query(collection(db, 'patients', user.uid, 'protocols'), orderBy('createdAt','desc')));
+      const protos = snap.docs.map(d => ({id:d.id,...d.data()}));
+      if (protos.length) renderProtocols(protos);
+    } catch(e) { console.error(e); }
+  });
+
+  window.handleSignOut = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+  function renderProtocols(protos) {
+    const container = document.getElementById('protocolContent');
+    const statusMap = {active:'sb-active',paused:'sb-paused',pending:'sb-pending',completed:'sb-pending'};
+    const statusLabel = {active:'Active Protocol',paused:'Protocol Paused',pending:'Awaiting Blood Results',completed:'Completed'};
+
+    container.innerHTML = protos.map(proto => {
+      const status = proto.status || 'active';
+      const date = proto.createdAt?.toDate ? proto.createdAt.toDate().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : '—';
+
+      const banner = `<div class="status-banner ${statusMap[status]||'sb-active'}">
+        <div>
+          <div class="sb-label">${statusLabel[status]||'Active'}</div>
+          <div class="sb-name">${proto.name}</div>
+          <div class="sb-meta">Prescribed ${date}${proto.createdBy ? ' · ' + proto.createdBy : ''}</div>
+        </div>
+        <button class="btn-msg" onclick="window.location.href='dashboard.html'">Message Clinician</button>
+      </div>`;
+
+      const meds = (proto.medications||[]).map(m => {
+        const info = MED_INFO[m.name] || {
+          what: m.name + ' is part of your prescribed hormone protocol.',
+          why: 'Your clinician has prescribed this based on your assessment and blood results.'
+        };
+        const historyHtml = m.previousDose
+          ? `<div class="med-history"><span class="dose-old">${m.previousDose}</span><span style="color:var(--dim);font-size:0.6rem;">→</span><span class="dose-new">${m.dose}</span><span class="dose-date">${m.reason||''}</span></div>`
+          : `<div class="med-history"><span class="dose-date">Started ${m.startDate||date}</span></div>`;
+        return `<div class="med-card">
+          <div class="med-route-badge">${m.route||'Oral'}</div>
+          <div class="med-name">${m.name}</div>
+          <div class="med-details">
+            <div class="md-item"><div class="md-label">Dose</div><div class="md-value">${m.dose}</div></div>
+            <div class="md-item"><div class="md-label">Frequency</div><div class="md-value">${m.freq}</div></div>
+          </div>
+          <div class="med-divider"></div>
+          <div class="med-what">${info.what}</div>
+          <div class="med-why">${info.why}</div>
+          ${historyHtml}
+        </div>`;
+      }).join('');
+
+      return banner + `<div class="section-label">Your Medications</div><div class="med-grid">${meds}</div>`;
+    }).join('<div style="height:32px;border-top:1px solid var(--line);margin-bottom:32px;"></div>');
+
+    document.getElementById('guideSection').style.display = 'block';
+  }
+</script>
+</body>
+</html>
