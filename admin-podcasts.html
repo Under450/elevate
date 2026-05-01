@@ -567,17 +567,22 @@ Write a complete, spoken-word podcast script with:
 Write as natural spoken word — authoritative, warm, and engaging. No music cues or production notes. Use clear section headers.`;
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://focus-trt.vercel.app/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: prompt }]
+          podcast: true,
+          title: study.title,
+          studyText: study.text,
+          category: study.category,
+          audience: audience,
+          length: length,
+          citation: study.citation || '',
+          doi: study.doi || ''
         })
       });
       const data = await res.json();
-      const script = data.content?.[0]?.text || '';
+      const script = data.script || '';
       if (!script) throw new Error('Empty response');
 
       window._currentScript = script;
