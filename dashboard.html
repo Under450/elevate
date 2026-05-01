@@ -993,7 +993,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
@@ -1004,33 +1004,37 @@
     appId: "1:1075531492371:web:64ef54b11f47401be063e6"
   };
 
-  const _app = initializeApp(firebaseConfig);
+  const _app  = initializeApp(firebaseConfig);
   const _auth = getAuth(_app);
   const _db   = getFirestore(_app);
 
-  // Auth gate — redirect to login if not signed in
+  // ── AUTH GATE + LOAD ALL DATA ──
   onAuthStateChanged(_auth, async user => {
     if (!user) return window.location.href = 'login.html';
 
-    // Load patient name
+    // Name + greeting
+    const firstName = (user.displayName || user.email || '').split(' ')[0];
     const nameEl = document.getElementById('patientGreeting');
-    const planEl = document.getElementById('patientPlan');
-    const emailEl = document.getElementById('patientEmail');
+    if (nameEl) nameEl.textContent = firstName;
 
-    if (nameEl) {
-      const firstName = (user.displayName || user.email).split(' ')[0];
-      nameEl.textContent = firstName;
-    }
+    const emailEl = document.getElementById('patientEmail');
     if (emailEl) emailEl.textContent = user.email;
 
-    // Load patient data from Firestore
+    // Load Firestore patient doc
     try {
       const snap = await getDoc(doc(_db, 'patients', user.uid));
       if (snap.exists()) {
         const data = snap.data();
+        const planEl = document.getElementById('patientPlan');
         if (planEl && data.plan) planEl.textContent = data.plan + ' Plan';
       }
-    } catch(e) {}
+    } catch(e) { console.error('Patient doc:', e); }
+
+    // Load protocols
+    loadProtocols(user.uid);
+
+    // Load podcasts
+    loadPodcasts();
   });
 
   window._handleSignOut = async function() {
@@ -1039,83 +1043,64 @@
   };
 
   // ── BIOMARKER RING GAUGES ──
-  // UK NHS / BSSM clinical reference ranges
-  // status: good=within range, warn=borderline, low=outside range (red)
   const biomarkers = [
-    { label:'Total Testosterone', value:28.4, display:'28.4', unit:'nmol/L', range:'8.6–29.0',    refLo:8.6,  refHi:29.0, min:0, max:35,  status:'good', statusText:'Optimal'   },
-    { label:'Free Testosterone',  value:485,  display:'485',  unit:'pmol/L', range:'170–670',     refLo:170,  refHi:670,  min:0, max:800, status:'good', statusText:'Optimal'   },
-    { label:'Estradiol (E2)',      value:142,  display:'142',  unit:'pmol/L', range:'90–160',      refLo:90,   refHi:160,  min:0, max:220, status:'warn', statusText:'Monitor'   },
-    { label:'Haematocrit',        value:46.2, display:'46.2', unit:'%',      range:'38–52%',      refLo:38,   refHi:52,   min:30, max:60, status:'good', statusText:'Normal'    },
-    { label:'SHBG',               value:22,   display:'22',   unit:'nmol/L', range:'17–55',       refLo:17,   refHi:55,   min:0, max:70,  status:'good', statusText:'Good'      },
-    { label:'PSA',                value:0.8,  display:'0.8',  unit:'ng/mL',  range:'<4.0',        refLo:0,    refHi:4.0,  min:0, max:6,   status:'good', statusText:'Normal'    },
-    { label:'LH',                 value:0.4,  display:'0.4',  unit:'IU/L',   range:'Suppressed',  refLo:0,    refHi:1.5,  min:0, max:3,   status:'warn', statusText:'On TRT'    },
-    { label:'Vitamin D',          value:74,   display:'74',   unit:'nmol/L', range:'>75 target',  refLo:75,   refHi:200,  min:0, max:200, status:'warn', statusText:'Low-Normal'},
+    { label:'Total Testosterone', value:28.4, display:'28.4', unit:'nmol/L', range:'8.6–29.0',   refLo:8.6,  refHi:29.0, min:0,  max:35,  statusText:'Optimal'    },
+    { label:'Free Testosterone',  value:485,  display:'485',  unit:'pmol/L', range:'170–670',     refLo:170,  refHi:670,  min:0,  max:800, statusText:'Optimal'    },
+    { label:'Estradiol (E2)',      value:142,  display:'142',  unit:'pmol/L', range:'90–160',      refLo:90,   refHi:160,  min:0,  max:220, statusText:'Monitor'    },
+    { label:'Haematocrit',        value:46.2, display:'46.2', unit:'%',      range:'38–52%',      refLo:38,   refHi:52,   min:30, max:60,  statusText:'Normal'     },
+    { label:'SHBG',               value:22,   display:'22',   unit:'nmol/L', range:'17–55',       refLo:17,   refHi:55,   min:0,  max:70,  statusText:'Good'       },
+    { label:'PSA',                value:0.8,  display:'0.8',  unit:'ng/mL',  range:'<4.0',        refLo:0,    refHi:4.0,  min:0,  max:6,   statusText:'Normal'     },
+    { label:'LH',                 value:0.4,  display:'0.4',  unit:'IU/L',   range:'Suppressed',  refLo:0,    refHi:1.5,  min:0,  max:3,   statusText:'On TRT'     },
+    { label:'Vitamin D',          value:74,   display:'74',   unit:'nmol/L', range:'>75 target',  refLo:75,   refHi:200,  min:0,  max:200, statusText:'Low-Normal' },
   ];
 
-  // Compute status from UK ranges
   biomarkers.forEach(bm => {
-    if (bm.value < bm.refLo || bm.value > bm.refHi) {
-      bm.status = 'low'; // red — outside UK limits
-    } else if (bm.value < bm.refLo * 1.05 || bm.value > bm.refHi * 0.95) {
-      bm.status = 'warn'; // amber — borderline
-    } else {
-      bm.status = 'good';
-    }
-    // Special overrides
-    if (bm.label === 'LH') bm.status = 'warn'; // expected suppressed on TRT
+    if (bm.value < bm.refLo || bm.value > bm.refHi) bm.status = 'low';
+    else if (bm.value < bm.refLo * 1.1 || bm.value > bm.refHi * 0.92) bm.status = 'warn';
+    else bm.status = 'good';
+    if (bm.label === 'LH') bm.status = 'warn';
     if (bm.label === 'Vitamin D') bm.status = bm.value < 75 ? 'low' : 'good';
   });
 
-  const R    = 44;
-  const CIRC = 2 * Math.PI * R;
+  const R = 44, CIRC = 2 * Math.PI * R;
 
   function makeBiomarkerTile(bm) {
-    const pct       = Math.min(Math.max((bm.value - bm.min) / (bm.max - bm.min), 0), 1);
-    const dashFill   = pct * CIRC;
-    const dashOffset = CIRC - dashFill;
-
+    const pct = Math.min(Math.max((bm.value - bm.min) / (bm.max - bm.min), 0), 1);
+    const dashOffset = CIRC - pct * CIRC;
     const div = document.createElement('div');
     div.className = 'biomarker';
-
     div.innerHTML =
       '<div class="bm-ring-wrap">' +
         '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
-          '<circle class="bm-ring-track" cx="50" cy="50" r="' + R + '" ' +
-            'stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="0"/>' +
-          '<circle class="bm-ring-fill ' + bm.status + '" cx="50" cy="50" r="' + R + '" ' +
-            'stroke-dasharray="' + CIRC.toFixed(2) + '" ' +
-            'stroke-dashoffset="' + CIRC.toFixed(2) + '" ' +
-            'data-target="' + dashOffset.toFixed(2) + '"/>' +
+          '<circle class="bm-ring-track" cx="50" cy="50" r="' + R + '" stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="0"/>' +
+          '<circle class="bm-ring-fill ' + bm.status + '" cx="50" cy="50" r="' + R + '" stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="' + CIRC.toFixed(2) + '" data-target="' + dashOffset.toFixed(2) + '"/>' +
         '</svg>' +
-        '<div class="bm-ring-inner">' +
-          '<div class="bm-value">' + bm.display + '</div>' +
-          '<div class="bm-unit">' + bm.unit + '</div>' +
-        '</div>' +
+        '<div class="bm-ring-inner"><div class="bm-value">' + bm.display + '</div><div class="bm-unit">' + bm.unit + '</div></div>' +
       '</div>' +
       '<div class="bm-label">' + bm.label + '</div>' +
       '<div class="bm-range">' + bm.range + '</div>' +
       '<span class="bm-status ' + bm.status + '">' + bm.statusText + '</span>';
-
     return div;
   }
 
   const grid = document.getElementById('biomarker-grid');
-  biomarkers.forEach(bm => grid.appendChild(makeBiomarkerTile(bm)));
+  if (grid) {
+    biomarkers.forEach(bm => grid.appendChild(makeBiomarkerTile(bm)));
+    setTimeout(() => {
+      document.querySelectorAll('.bm-ring-fill').forEach(el => {
+        el.style.strokeDashoffset = el.dataset.target;
+      });
+    }, 300);
+  }
 
-  // Animate rings after DOM settles
-  setTimeout(function() {
-    document.querySelectorAll('.bm-ring-fill').forEach(function(el) {
-      el.style.strokeDashoffset = el.dataset.target;
-    });
-  }, 200);
+  // ── DATE ──
+  const dateEl = document.getElementById('dateTag');
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  // Date
-  const d = new Date();
-  document.getElementById('dateTag').textContent = d.toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-  // Check-in dots
+  // ── CHECK-IN DOTS ──
   ['energy','mood','libido','sleep'].forEach(id => {
     const wrap = document.getElementById('ci-' + id);
+    if (!wrap) return;
     for (let i = 1; i <= 5; i++) {
       const dot = document.createElement('div');
       dot.className = 'checkin-dot';
@@ -1128,59 +1113,72 @@
     }
   });
 
-  function saveCheckin(btn) {
+  window.saveCheckin = function(btn) {
     btn.textContent = '✓ Saved';
     btn.style.borderColor = 'var(--copper)';
     btn.style.color = 'var(--copper)';
-  }
+  };
 
-  function toggleAssessment(e) {
+  window.toggleAssessment = function(e) {
     e.preventDefault();
     const sub   = document.getElementById('assessSub');
     const caret = document.getElementById('assessCaret');
     const open  = sub.style.display === 'flex';
-    sub.style.display   = open ? 'none' : 'flex';
+    sub.style.display     = open ? 'none' : 'flex';
     caret.style.transform = open ? '' : 'rotate(180deg)';
-  }
+  };
 
-  function selectPlan(plan) {
-    // Placeholder — will wire to Stripe checkout
-    alert('Stripe checkout for ' + plan + ' plan coming soon.');
-  }
+  window.selectPlan = function(plan) {
+    window.location.href = 'package-' + plan.toLowerCase() + '.html';
+  };
 
-  // ── INNER CIRCLE PODCAST LOADER ──
-  (async function loadPodcasts() {
-    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
-      authDomain: "revive-clinic-885e7.firebaseapp.com",
-      projectId: "revive-clinic-885e7",
-      storageBucket: "revive-clinic-885e7.firebasestorage.app",
-      messagingSenderId: "1075531492371",
-      appId: "1:1075531492371:web:64ef54b11f47401be063e6"
-    };
-
-    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-
+  // ── PROTOCOLS ──
+  async function loadProtocols(uid) {
+    const wrap = document.getElementById('protocolWrap');
+    if (!wrap) return;
     try {
-      const snap = await getDocs(query(collection(db, 'podcasts'), where('status', '==', 'published')));
-      const podcasts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const grid = document.getElementById('podcastGrid');
+      const snap = await getDocs(collection(_db, 'patients', uid, 'protocols'));
+      const protos = snap.docs.map(d => ({id:d.id,...d.data()}));
+      if (!protos.length) {
+        wrap.innerHTML = '<div class="card" style="text-align:center;padding:32px;font-size:0.72rem;color:var(--dim);letter-spacing:0.1em;">No protocol assigned yet. Your clinician will add your prescription after your consultation.</div>';
+        return;
+      }
+      wrap.innerHTML = protos.map(pr =>
+        '<div class="card" style="margin-bottom:12px;">' +
+          '<div style="font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;">' + pr.name + '</div>' +
+          '<div class="protocol-grid">' +
+            (pr.medications||[]).map(m =>
+              '<div class="protocol-item">' +
+                '<div class="pi-name">' + m.name + '</div>' +
+                '<div class="pi-dose">' + m.dose + '</div>' +
+                '<div class="pi-freq">' + m.freq + '</div>' +
+              '</div>'
+            ).join('') +
+          '</div>' +
+        '</div>'
+      ).join('');
+    } catch(e) {
+      wrap.innerHTML = '<div class="card" style="text-align:center;padding:24px;font-size:0.72rem;color:var(--dim);">Could not load protocol.</div>';
+    }
+  }
 
-      if (!podcasts.length) {
+  // ── PODCASTS ──
+  async function loadPodcasts() {
+    const grid = document.getElementById('podcastGrid');
+    if (!grid) return;
+    try {
+      const snap = await getDocs(query(collection(_db, 'podcasts'), where('status','==','published')));
+      const pods = snap.docs.map(d => ({id:d.id,...d.data()}));
+      window._podcasts = pods;
+      if (!pods.length) {
         grid.innerHTML = '<div style="grid-column:span 3;text-align:center;padding:32px;font-size:0.72rem;color:var(--dim);letter-spacing:0.1em;">No episodes published yet. Check back soon.</div>';
         return;
       }
-
-      const catLabels = { trt:'TRT', hrt:'HRT', longevity:'Longevity', 'sexual-health':'Sexual Health', 'weight-loss':'Weight Loss', nutrition:'Nutrition', general:'General' };
-
-      grid.innerHTML = podcasts.map(p => {
+      const cats = {trt:'TRT',hrt:'HRT',longevity:'Longevity','sexual-health':'Sexual Health','weight-loss':'Weight Loss',nutrition:'Nutrition',general:'General'};
+      grid.innerHTML = pods.map(p => {
         const date    = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') : '—';
-        const cat     = catLabels[p.category] || p.category || 'Research';
-        const preview = (p.script || '').substring(0, 200) + '…';
+        const cat     = cats[p.category] || p.category || 'Research';
+        const preview = (p.script||'').substring(0,200) + '…';
         return '<div class="podcast-card" onclick="openPodcast('' + p.id + '')">' +
           '<div class="pc-cat">' + cat + '</div>' +
           '<div class="pc-title">' + p.title + '</div>' +
@@ -1189,23 +1187,18 @@
           '<span class="pc-read">Read Episode →</span>' +
           '</div>';
       }).join('');
-
-      // Store for modal
-      window._podcasts = podcasts;
-
     } catch(e) {
-      document.getElementById('podcastGrid').innerHTML =
-        '<div style="grid-column:span 3;text-align:center;padding:32px;font-size:0.72rem;color:var(--dim);">Could not load episodes.</div>';
+      console.error('Podcast load:', e);
     }
-  })();
+  }
 
   window.openPodcast = function(id) {
-    const p = (window._podcasts || []).find(x => x.id === id);
+    const p = (window._podcasts||[]).find(x => x.id === id);
     if (!p) return;
-    const cat = { trt:'TRT', hrt:'HRT', longevity:'Longevity', 'sexual-health':'Sexual Health', 'weight-loss':'Weight Loss', nutrition:'Nutrition', general:'General' }[p.category] || p.category;
+    const cats = {trt:'TRT',hrt:'HRT',longevity:'Longevity','sexual-health':'Sexual Health','weight-loss':'Weight Loss',nutrition:'Nutrition',general:'General'};
     const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') : '—';
-    document.getElementById('podModalTitle').textContent = p.title;
-    document.getElementById('podModalMeta').textContent  = cat + ' · Published ' + date + (p.source ? ' · Source: ' + p.source : '');
+    document.getElementById('podModalTitle').textContent  = p.title;
+    document.getElementById('podModalMeta').textContent   = (cats[p.category]||p.category) + ' · Published ' + date + (p.source ? ' · ' + p.source : '');
     document.getElementById('podModalScript').textContent = p.script || '';
     document.getElementById('podModalOverlay').classList.add('open');
   };
