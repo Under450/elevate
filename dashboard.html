@@ -1050,6 +1050,26 @@
       </div>
     </div>
 
+    <!-- INNER CIRCLE BANNER -->
+    <div class="dashboard-section">
+      <div style="background:linear-gradient(135deg,rgba(184,115,51,0.15),rgba(184,115,51,0.04));border:1px solid rgba(184,115,51,0.35);border-radius:2px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:10px;">The Inner Circle</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--cream);margin-bottom:8px;line-height:1.2;">Members-only community, <em style="font-style:italic;color:var(--tan);">events</em> and expert Q&amp;As</div>
+          <div style="font-size:0.7rem;color:var(--dim);letter-spacing:0.08em;">Private forum · monthly clinician AMAs · quarterly retreats · research podcasts</div>
+        </div>
+        <button style="padding:16px 40px;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;border-radius:1px;white-space:nowrap;flex-shrink:0;" onclick="document.getElementById('podcastGrid').scrollIntoView({behavior:'smooth'})">Enter →</button>
+      </div>
+    </div>
+
+    <!-- INNER CIRCLE PODCASTS -->
+    <div class="dashboard-section">
+      <div class="section-label">Inner Circle — Research Podcasts</div>
+      <div id="podcastGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div style="grid-column:span 3;text-align:center;padding:32px;font-size:0.72rem;color:var(--dim);letter-spacing:0.1em;">Loading episodes…</div>
+      </div>
+    </div>
+
   </main>
 </div>
 
