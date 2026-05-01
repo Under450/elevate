@@ -1174,22 +1174,15 @@
     return div;
   }
 
-  // Render rings as soon as DOM is ready — independent of auth
-  function renderRings() {
-    const grid = document.getElementById('biomarker-grid');
-    if (!grid || grid.children.length > 0) return; // already rendered
+  // Render rings — runs after module fully parsed
+  const grid = document.getElementById('biomarker-grid');
+  if (grid) {
     biomarkers.forEach(bm => grid.appendChild(makeBiomarkerTile(bm)));
     setTimeout(() => {
       document.querySelectorAll('.bm-ring-fill').forEach(el => {
         el.style.strokeDashoffset = el.dataset.target;
       });
     }, 300);
-  }
-  renderRings(); // call immediately
-
-  // Also call on DOMContentLoaded as fallback
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderRings);
   }
 
   // ── DATE ──
