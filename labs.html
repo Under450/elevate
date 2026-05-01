@@ -288,31 +288,19 @@ Extract ALL biomarker values from this blood test report. Return ONLY a JSON obj
 
 Group markers logically. Include every value you can find. Use UK reference ranges where provided in the report.`;
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      // Call the REVIVE proxy API (focus-trt.vercel.app/api/analyze)
+      const response = await fetch('https://focus-trt.vercel.app/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [{
-            role: 'user',
-            content: [{
-              type: mediaType === 'application/pdf' ? 'document' : 'image',
-              source: { type: 'base64', media_type: mediaType, data: b64 }
-            }, {
-              type: 'text',
-              text: prompt
-            }]
-          }]
-        })
+        body: JSON.stringify({ base64: b64, mediaType })
       });
 
-      const data = await response.json();
-      let text = data.content?.[0]?.text || '';
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Extraction failed');
+      }
 
-      // Strip markdown fences
-      text = text.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(text);
+      const parsed = await response.json();
       currentResults = parsed;
 
       // Show results
@@ -374,20 +362,21 @@ Group markers logically. Include every value you can find. Use UK reference rang
     document.getElementById('insightPanel').classList.add('open');
 
     try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      const resp = await fetch('https://focus-trt.vercel.app/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 600,
-          messages: [{
-            role: 'user',
-            content: 'You are a UK hormone clinic clinician. A patient on TRT/HRT has a ' + m.name + ' result of ' + m.value + ' ' + m.unit + ' (status: ' + m.status + ', UK ref: ' + (m.reference_low || '?') + '–' + (m.reference_high || '?') + '). Write three short paragraphs: 1) What this result means clinically (2-3 sentences). 2) What the UK reference range means and how this result compares. 3) Specific implications for someone on TRT or HRT. Be direct and accessible. No bullet points.'
-          }]
+          insight: true,
+          markerName: m.name,
+          markerValue: m.value,
+          markerUnit: m.unit,
+          markerStatus: m.status,
+          refLow: m.reference_low,
+          refHigh: m.reference_high
         })
       });
       const d = await resp.json();
-      const text = d.content?.[0]?.text || 'No interpretation available.';
+      const text = d.text || 'No interpretation available.';
       const paras = text.split('\n\n').filter(p => p.trim());
       document.getElementById('insightText').innerHTML    = '<div class="insight-text">' + (paras[0] || text) + '</div>';
       document.getElementById('insightRange').innerHTML   = '<div class="insight-text">' + (paras[1] || (m.reference_low + '–' + m.reference_high + ' ' + m.unit)) + '</div>';
