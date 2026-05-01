@@ -1304,6 +1304,9 @@
     }
   }
 
+  // Call loadPodcasts immediately — podcasts are public, no auth needed
+  loadPodcasts();
+
   window.openPodcast = function(id) {
     const p = (window._podcasts||[]).find(x => x.id === id);
     if (!p) return;
