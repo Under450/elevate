@@ -570,20 +570,7 @@
   <!-- Header -->
   <div class="header">
     <div>
-      <a id="backBtn" href="dashboard.html" style="display:inline-flex;align-items:center;gap:5px;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.6);text-decoration:none;margin-bottom:6px;transition:color 0.2s;" onmouseover="this.style.color='#c8a855'" onmouseout="this.style.color='rgba(200,168,85,0.6)'">&#8592; Back</a>
-      <script>
-        (function() {
-          var ref = document.referrer;
-          var btn = document.getElementById('backBtn');
-          if (ref && ref.indexOf('admin') !== -1) {
-            btn.href = 'admin.html';
-            btn.textContent = '← Admin Panel';
-          } else {
-            btn.href = 'dashboard.html';
-            btn.textContent = '← Dashboard';
-          }
-        })();
-      </script>
+      <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:5px;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.6);text-decoration:none;margin-bottom:6px;transition:color 0.2s;" onmouseover="this.style.color='#c8a855'" onmouseout="this.style.color='rgba(200,168,85,0.6)'">&#8592; Dashboard</a>
       <div class="header__brand">Revive</div>
       <div class="header__sub">Injection Tracker</div>
     </div>
