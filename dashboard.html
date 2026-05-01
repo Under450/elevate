@@ -1291,7 +1291,7 @@
         const date    = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') : '—';
         const cat     = cats[p.category] || p.category || 'Research';
         const preview = (p.script||'').substring(0,200) + '…';
-        return '<div class="podcast-card" onclick="openPodcast('' + p.id + '')">' +
+        return '<div class="podcast-card" onclick="openPodcast(\'' + p.id + '\')">' +
           '<div class="pc-cat">' + cat + '</div>' +
           '<div class="pc-title">' + p.title + '</div>' +
           '<div class="pc-meta">Published ' + date + '</div>' +
