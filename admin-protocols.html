@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
 <style>
-  :root{--navy:#0d1520;--navy2:#111d2b;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;--dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.2);--sidebar:220px;--green:#3cb371;}
+  :root{--navy:#0d1520;--navy2:#111d2b;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;--dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.2);--sidebar:220px;--green:#3cb371;--amber:#c4883a;--red:#e03535;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;background:var(--navy2);color:var(--cream);font-family:'Didact Gothic',sans-serif;overflow-x:hidden;}
   aside{width:var(--sidebar);min-height:100vh;background:#0a1018;border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:0 0 24px;}
@@ -26,81 +26,117 @@
   .sb-user-role{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);}
   .btn-signout{margin-top:8px;font-size:0.58rem;color:var(--dim);background:none;border:none;cursor:pointer;letter-spacing:0.1em;padding:0;}
   .btn-signout:hover{color:var(--cream);}
-  main{margin-left:var(--sidebar);padding:36px 36px 80px;}
+
+  main{margin-left:var(--sidebar);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+  .top-bar{padding:24px 28px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;justify-content:space-between;flex-shrink:0;}
   .page-eyebrow{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;}
-  .page-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:28px;}
+  .page-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--cream);}
   .page-title em{font-style:italic;color:var(--tan);}
-  .section-label{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .patient-row{display:flex;align-items:center;gap:10px;}
+  .patient-select{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:8px 14px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.72rem;outline:none;min-width:220px;}
+  .patient-select:focus{border-color:var(--copper);}
+  .patient-select option{background:#111d2b;}
+
+  .body-grid{display:grid;grid-template-columns:1fr 360px;flex:1;overflow:hidden;}
+  .col-left{padding:20px 20px 20px 28px;overflow-y:auto;border-right:1px solid var(--line);}
+  .col-right{padding:20px;overflow-y:auto;background:rgba(10,16,24,0.5);}
+
+  .section-label{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
   .section-label::after{content:'';flex:1;height:1px;background:var(--line);}
-  .layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;}
-  .card{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:24px;margin-bottom:20px;}
-  .card-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--cream);margin-bottom:14px;}
 
-  /* PATIENT SELECTOR */
-  .field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
-  .field label{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--dim);}
-  .field select,.field input{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:11px 14px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.78rem;outline:none;transition:border-color 0.2s;width:100%;}
-  .field select:focus,.field input:focus{border-color:var(--copper);}
-  .field select option{background:#111d2b;}
+  /* TEMPLATES */
+  .template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+  .template-tile{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:14px;cursor:pointer;transition:all 0.2s;}
+  .template-tile:hover{border-color:var(--copper);background:rgba(184,115,51,0.06);}
+  .template-tile.selected{border-color:var(--copper);background:rgba(184,115,51,0.1);}
+  .tt-cat{font-size:0.48rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);margin-bottom:5px;}
+  .tt-name{font-size:0.75rem;color:var(--cream);margin-bottom:3px;}
+  .tt-count{font-size:0.62rem;color:var(--dim);}
 
-  /* PROTOCOL NAME ROW */
-  .proto-name-row{display:flex;gap:10px;margin-bottom:16px;}
-  .proto-name-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:10px 14px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.78rem;outline:none;}
-  .proto-name-input:focus{border-color:var(--copper);}
-  .proto-name-input::placeholder{color:rgba(251,243,218,0.2);}
+  /* PROTO META */
+  .proto-meta-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:16px;align-items:center;}
+  .field-input{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:9px 12px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.75rem;outline:none;width:100%;}
+  .field-input:focus{border-color:var(--copper);}
+  .field-input::placeholder{color:rgba(251,243,218,0.2);}
+  .field-select{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:9px 12px;color:var(--tan);font-family:'Didact Gothic',sans-serif;font-size:0.7rem;outline:none;}
+  .field-select option{background:#111d2b;}
 
-  /* MED TILES LIBRARY */
-  .med-library-title{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;}
-  .med-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
-  .med-tile{background:rgba(10,16,26,0.8);border:1px solid var(--line);border-radius:2px;padding:12px 14px;cursor:pointer;transition:all 0.2s;text-align:left;}
-  .med-tile:hover{border-color:var(--copper);background:rgba(184,115,51,0.06);}
-  .med-tile-name{font-size:0.72rem;color:var(--cream);margin-bottom:3px;}
-  .med-tile-dose{font-size:0.6rem;color:var(--dim);}
-  .med-tile-freq{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--copper);margin-top:4px;}
+  /* MED LIBRARY */
+  .med-cat-label{font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(184,115,51,0.65);margin:12px 0 6px;}
+  .med-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .med-tile{background:rgba(10,16,24,0.8);border:1px solid var(--line);border-radius:2px;padding:11px 13px;cursor:pointer;transition:all 0.2s;position:relative;}
+  .med-tile:hover{border-color:var(--copper);}
+  .med-tile.in-proto{border-color:rgba(60,179,113,0.4);background:rgba(60,179,113,0.05);}
+  .mt-name{font-size:0.72rem;color:var(--cream);margin-bottom:2px;}
+  .mt-dose{font-size:0.62rem;color:var(--dim);}
+  .mt-freq{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-top:4px;}
+  .mt-check{position:absolute;top:8px;right:8px;width:14px;height:14px;background:var(--green);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:8px;color:#0d1520;}
+  .med-tile.in-proto .mt-check{display:flex;}
 
-  /* CUSTOM ADD */
-  .custom-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;}
-  .custom-input{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:9px 12px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.72rem;outline:none;width:100%;}
-  .custom-input:focus{border-color:var(--copper);}
-  .custom-input::placeholder{color:rgba(251,243,218,0.2);}
+  /* CUSTOM MED */
+  .custom-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:end;margin-top:8px;}
 
-  /* CURRENT PROTOCOL LIST */
-  .proto-list{display:flex;flex-direction:column;gap:8px;min-height:60px;}
-  .proto-item{background:rgba(22,32,48,0.7);border:1px solid var(--line);border-radius:2px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
-  .proto-item-name{font-size:0.75rem;color:var(--cream);flex:1;}
-  .proto-item-dose{font-size:0.65rem;color:var(--dim);}
-  .proto-item-freq{font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);}
-  .proto-item-remove{background:none;border:none;color:var(--dim);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:1px;transition:all 0.15s;}
-  .proto-item-remove:hover{color:#e05555;background:rgba(224,53,53,0.1);}
-  .proto-empty{font-size:0.68rem;color:var(--dim);text-align:center;padding:20px;letter-spacing:0.1em;border:1px dashed var(--line);border-radius:2px;}
+  /* RIGHT COL */
+  .proto-right-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .proto-right-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--cream);}
+  .status-badge{font-size:0.48rem;letter-spacing:0.2em;text-transform:uppercase;padding:3px 9px;border-radius:1px;}
+  .status-active{background:rgba(60,179,113,0.12);color:var(--green);border:1px solid rgba(60,179,113,0.25);}
+  .status-paused{background:rgba(196,136,58,0.12);color:#e8a855;border:1px solid rgba(196,136,58,0.25);}
+  .status-pending{background:rgba(184,115,51,0.12);color:var(--tan);border:1px solid var(--line);}
+  .status-completed{background:rgba(255,255,255,0.05);color:var(--dim);border:1px solid var(--line);}
 
-  /* SAVED PROTOCOLS */
-  .saved-proto{background:rgba(17,29,43,0.7);border:1px solid var(--line);border-radius:2px;padding:14px 18px;margin-bottom:10px;}
-  .saved-proto-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .saved-proto-name{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--cream);}
-  .saved-proto-meta{font-size:0.58rem;color:var(--dim);letter-spacing:0.08em;}
-  .saved-proto-meds{display:flex;flex-wrap:wrap;gap:6px;}
-  .saved-proto-med{font-size:0.6rem;background:rgba(184,115,51,0.1);border:1px solid var(--line);padding:3px 8px;border-radius:1px;color:var(--tan);}
-  .saved-proto-actions{display:flex;gap:8px;margin-top:10px;}
-  .btn-sm{padding:6px 14px;font-family:'Didact Gothic',sans-serif;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;border:1px solid var(--line);background:transparent;color:var(--dim);}
-  .btn-sm:hover{border-color:var(--copper);color:var(--cream);}
-  .btn-sm.danger:hover{border-color:#e05555;color:#e05555;}
+  /* LINKED LABS */
+  .linked-labs-box{background:rgba(184,115,51,0.06);border:1px solid rgba(184,115,51,0.2);border-radius:2px;padding:10px 13px;margin-bottom:14px;}
+  .ll-label{font-size:0.5rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--copper);margin-bottom:4px;}
+  .ll-select{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(184,115,51,0.2);border-radius:2px;padding:7px 10px;color:var(--tan);font-family:'Didact Gothic',sans-serif;font-size:0.65rem;outline:none;}
+
+  /* PROTOCOL ITEMS */
+  .proto-item{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:13px 14px;margin-bottom:8px;position:relative;}
+  .proto-item:hover{border-color:rgba(184,115,51,0.35);}
+  .pi-name{font-size:0.78rem;color:var(--cream);margin-bottom:6px;}
+  .pi-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;}
+  .pi-field label{font-size:0.48rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:3px;}
+  .pi-field input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:2px;padding:5px 8px;color:var(--tan);font-family:'Didact Gothic',sans-serif;font-size:0.68rem;outline:none;}
+  .pi-field input:focus{border-color:var(--copper);}
+  .pi-history{font-size:0.6rem;color:rgba(251,243,218,0.25);padding-top:6px;border-top:1px solid rgba(184,115,51,0.1);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .dose-old{background:rgba(184,115,51,0.1);color:rgba(184,115,51,0.45);padding:1px 6px;border-radius:1px;font-size:0.55rem;text-decoration:line-through;}
+  .dose-new{background:rgba(184,115,51,0.18);color:var(--copper);padding:1px 6px;border-radius:1px;font-size:0.55rem;}
+  .dose-reason{color:rgba(251,243,218,0.2);font-size:0.58rem;}
+  .pi-remove{position:absolute;top:10px;right:10px;background:none;border:none;color:rgba(251,243,218,0.2);cursor:pointer;font-size:0.85rem;padding:2px 5px;border-radius:1px;transition:all 0.15s;}
+  .pi-remove:hover{color:var(--red);background:rgba(224,53,53,0.1);}
+
+  .empty-proto{border:1px dashed var(--line);border-radius:2px;padding:32px;text-align:center;font-size:0.68rem;color:var(--dim);letter-spacing:0.1em;margin-bottom:14px;}
+
+  /* NOTES */
+  .notes-area{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:2px;padding:10px 12px;color:var(--cream);font-family:'Didact Gothic',sans-serif;font-size:0.72rem;outline:none;resize:vertical;min-height:70px;margin-bottom:12px;}
+  .notes-area:focus{border-color:var(--copper);}
+  .notes-area::placeholder{color:rgba(251,243,218,0.2);}
 
   /* BUTTONS */
-  .btn{padding:11px 22px;font-family:'Didact Gothic',sans-serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;border:none;}
-  .btn-primary{background:var(--copper);color:var(--navy);}
+  .btn-primary{padding:12px;width:100%;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;margin-bottom:8px;}
   .btn-primary:hover{background:var(--tan);}
   .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
-  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--dim);}
+  .btn-outline{padding:10px;width:100%;background:transparent;border:1px solid var(--line);color:var(--dim);font-family:'Didact Gothic',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all 0.2s;}
   .btn-outline:hover{border-color:var(--copper);color:var(--cream);}
-  .btn-row{display:flex;gap:10px;align-items:center;margin-top:14px;}
+  .btn-sm-add{padding:9px 12px;background:var(--copper);border:none;color:var(--navy);font-family:'Didact Gothic',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:1px;}
 
-  .status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:2px;font-size:0.68rem;margin-top:12px;}
-  .status-ok{background:rgba(60,179,113,0.1);border:1px solid rgba(60,179,113,0.3);color:var(--green);}
-  .status-err{background:rgba(224,53,53,0.1);border:1px solid rgba(224,53,53,0.3);color:#e05555;}
+  /* STATUS BAR */
+  .status-bar{padding:10px 14px;border-radius:2px;font-size:0.68rem;margin-bottom:10px;display:none;align-items:center;gap:8px;}
+  .status-bar.show{display:flex;}
+  .sb-ok{background:rgba(60,179,113,0.1);border:1px solid rgba(60,179,113,0.3);color:var(--green);}
+  .sb-err{background:rgba(224,53,53,0.1);border:1px solid rgba(224,53,53,0.3);color:#e05555;}
 
-  @media(max-width:1100px){.layout{grid-template-columns:1fr;}}
-  @media(max-width:900px){:root{--sidebar:0px;}main{margin-left:0;padding:20px 16px 60px;}.med-tiles{grid-template-columns:1fr;}.custom-row{grid-template-columns:1fr 1fr;}}
+  /* SAVED PROTOCOLS LIST */
+  .saved-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+  .saved-item{background:rgba(17,29,43,0.7);border:1px solid var(--line);border-radius:2px;padding:12px 14px;cursor:pointer;transition:border-color 0.2s;}
+  .saved-item:hover{border-color:rgba(184,115,51,0.4);}
+  .si-name{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--cream);margin-bottom:3px;}
+  .si-meta{font-size:0.6rem;color:var(--dim);letter-spacing:0.08em;}
+  .si-meds{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+  .si-med{font-size:0.55rem;background:rgba(184,115,51,0.1);border:1px solid var(--line);color:var(--tan);padding:2px 7px;border-radius:1px;}
+
+  @media(max-width:1100px){.body-grid{grid-template-columns:1fr;}.col-right{border-top:1px solid var(--line);}}
+  @media(max-width:900px){:root{--sidebar:0px;}main{margin-left:0;}.template-grid{grid-template-columns:1fr 1fr;}.med-tiles{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -130,77 +166,143 @@
 </aside>
 
 <main>
-  <div class="page-eyebrow">Clinical Management</div>
-  <h1 class="page-title">Protocol <em>Builder</em></h1>
+  <div class="top-bar">
+    <div>
+      <div class="page-eyebrow">Clinical Management</div>
+      <h1 class="page-title">Protocol <em>Builder</em></h1>
+    </div>
+    <div class="patient-row">
+      <select class="patient-select" id="patientSelect" onchange="selectPatient()">
+        <option value="">— Select a patient —</option>
+      </select>
+    </div>
+  </div>
 
-  <div class="layout">
-
+  <div class="body-grid">
     <!-- LEFT: BUILDER -->
-    <div>
-      <!-- Patient Selector -->
-      <div class="card">
-        <div class="card-title">Select Patient</div>
-        <div class="field">
-          <label>Patient</label>
-          <select id="patientSelect" onchange="selectPatient()">
-            <option value="">— Loading patients —</option>
-          </select>
+    <div class="col-left">
+
+      <!-- TEMPLATES -->
+      <div class="section-label">Quick Templates</div>
+      <div class="template-grid" id="templateGrid">
+        <div class="template-tile" onclick="applyTemplate('trt-starter')">
+          <div class="tt-cat">TRT</div><div class="tt-name">TRT Starter</div><div class="tt-count">Testosterone + Vit D</div>
         </div>
-        <div id="patientInfo" style="display:none;font-size:0.68rem;color:var(--dim);line-height:1.7;"></div>
+        <div class="template-tile" onclick="applyTemplate('trt-full')">
+          <div class="tt-cat">TRT</div><div class="tt-name">TRT + Ancillaries</div><div class="tt-count">T + HCG + Anastrozole</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('trt-performance')">
+          <div class="tt-cat">TRT</div><div class="tt-name">TRT Performance</div><div class="tt-count">Full optimisation stack</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('hrt-phase1')">
+          <div class="tt-cat">HRT</div><div class="tt-name">HRT Phase 1</div><div class="tt-count">Oestradiol + Progesterone</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('hrt-full')">
+          <div class="tt-cat">HRT</div><div class="tt-name">Menopause Full</div><div class="tt-count">E2 + Prog + Testosterone</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('weight-loss')">
+          <div class="tt-cat">Weight Loss</div><div class="tt-name">GLP-1 + TRT</div><div class="tt-count">Semaglutide + T</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('sexual-health')">
+          <div class="tt-cat">Sexual Health</div><div class="tt-name">ED + TRT</div><div class="tt-count">T + Tadalafil</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('longevity')">
+          <div class="tt-cat">Longevity</div><div class="tt-name">Longevity Stack</div><div class="tt-count">NAD+ + B12 + TRT</div>
+        </div>
+        <div class="template-tile" onclick="applyTemplate('blank')">
+          <div class="tt-cat">Custom</div><div class="tt-name">Blank Protocol</div><div class="tt-count">Start from scratch</div>
+        </div>
       </div>
 
-      <!-- Protocol Builder -->
-      <div class="card" id="builderCard" style="display:none;">
-        <div class="card-title">Build Protocol</div>
+      <!-- PROTOCOL NAME + STATUS -->
+      <div class="proto-meta-row">
+        <input class="field-input" id="protoName" placeholder="Protocol name e.g. TRT Foundation — May 2026">
+        <select class="field-select" id="protoStatus">
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="pending">Pending Bloods</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
 
-        <!-- Protocol name -->
-        <div class="field">
-          <label>Protocol Name</label>
-          <input class="proto-name-input" type="text" id="protoName" placeholder="e.g. TRT Foundation, HRT Phase 1, Weight Loss Protocol…">
-        </div>
+      <!-- MED LIBRARY -->
+      <div class="section-label">Medication Library — click to add</div>
 
-        <!-- Pre-made medication tiles -->
-        <div class="med-library-title">Pre-made Medications — click to add</div>
-        <div class="med-tiles" id="medTiles"></div>
+      <div class="med-cat-label">Testosterone</div>
+      <div class="med-tiles" id="lib-trt"></div>
 
-        <!-- Custom medication -->
-        <div class="med-library-title" style="margin-top:4px;">Add Custom Medication</div>
-        <div class="custom-row">
-          <input class="custom-input" type="text" id="custName" placeholder="Medication name">
-          <input class="custom-input" type="text" id="custDose" placeholder="Dose (e.g. 100mg)">
-          <input class="custom-input" type="text" id="custFreq" placeholder="Frequency (e.g. Daily)">
-          <button class="btn btn-primary" onclick="addCustom()" style="white-space:nowrap;padding:9px 16px;">+ Add</button>
-        </div>
+      <div class="med-cat-label">Ancillaries</div>
+      <div class="med-tiles" id="lib-anc"></div>
 
-        <!-- Current build list -->
-        <div class="section-label" style="margin-top:16px;">Protocol Items</div>
-        <div class="proto-list" id="protoList">
-          <div class="proto-empty">No medications added yet. Click a tile or add custom above.</div>
-        </div>
+      <div class="med-cat-label">HRT</div>
+      <div class="med-tiles" id="lib-hrt"></div>
 
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveProtocol()" id="saveBtn">Save Protocol to Patient</button>
-          <button class="btn btn-outline" onclick="clearBuild()">Clear</button>
-        </div>
-        <div id="saveStatus" style="display:none;"></div>
+      <div class="med-cat-label">Supplements</div>
+      <div class="med-tiles" id="lib-supp"></div>
+
+      <div class="med-cat-label">Weight Loss</div>
+      <div class="med-tiles" id="lib-weight"></div>
+
+      <div class="med-cat-label">Sexual Health</div>
+      <div class="med-tiles" id="lib-sex"></div>
+
+      <div class="med-cat-label">Longevity &amp; Peptides</div>
+      <div class="med-tiles" id="lib-long"></div>
+
+      <!-- CUSTOM MED -->
+      <div class="section-label" style="margin-top:16px;">Add Custom Medication</div>
+      <div class="custom-row">
+        <input class="field-input" id="custName" placeholder="Medication name">
+        <input class="field-input" id="custDose" placeholder="Dose">
+        <input class="field-input" id="custFreq" placeholder="Frequency">
+        <button class="btn-sm-add" onclick="addCustom()">+ Add</button>
       </div>
     </div>
 
-    <!-- RIGHT: SAVED PROTOCOLS -->
-    <div>
-      <div class="section-label">Patient's Active Protocols</div>
-      <div id="savedProtocols">
-        <div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:24px;">Select a patient to view their protocols.</div>
+    <!-- RIGHT: CURRENT PROTOCOL -->
+    <div class="col-right">
+      <div class="proto-right-header">
+        <div class="proto-right-name" id="rightProtoName">New Protocol</div>
+        <span class="status-badge status-active" id="rightStatus">Active</span>
+      </div>
+
+      <!-- LINKED LABS -->
+      <div class="linked-labs-box">
+        <div class="ll-label">Link to Blood Results</div>
+        <select class="ll-select" id="labsSelect">
+          <option value="">No labs linked</option>
+        </select>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar" id="statusBar"></div>
+
+      <!-- PROTOCOL ITEMS -->
+      <div class="section-label">Protocol Items</div>
+      <div id="protoItems">
+        <div class="empty-proto" id="emptyMsg">No medications added yet. Click a template or tile above.</div>
+      </div>
+
+      <!-- CLINICIAN NOTES -->
+      <div class="section-label">Clinician Notes <span style="font-size:0.5rem;color:var(--dim);text-transform:none;letter-spacing:0;">(internal — not visible to patient)</span></div>
+      <textarea class="notes-area" id="clinicianNotes" placeholder="Clinical reasoning, patient preferences, contraindications, dose adjustment rationale…"></textarea>
+
+      <button class="btn-primary" onclick="saveProtocol()" id="saveBtn">Save Protocol to Patient</button>
+      <button class="btn-outline" onclick="clearBuild()">Clear &amp; Start New</button>
+
+      <!-- SAVED PROTOCOLS -->
+      <div class="section-label" style="margin-top:20px;">Saved Protocols</div>
+      <div class="saved-list" id="savedList">
+        <div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:16px;">Select a patient to view their protocols.</div>
       </div>
     </div>
-
   </div>
 </main>
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey:"AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
@@ -215,218 +317,324 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
   let currentUser = null;
-  let allPatients = [];
   let currentPatientId = null;
   let buildItems = [];
+  let allPatients = [];
 
-  // ── PRE-MADE MEDICATION LIBRARY ──
-  const MED_LIBRARY = [
-    // TRT
-    { name:'Testosterone Cypionate', dose:'100mg / 0.5ml', freq:'Mon & Thu · IM', cat:'TRT' },
-    { name:'Testosterone Enanthate', dose:'125mg / 0.5ml', freq:'Weekly · IM', cat:'TRT' },
-    { name:'Testosterone Gel',       dose:'50mg / 5g',     freq:'Daily · Topical', cat:'TRT' },
-    // Ancillaries
-    { name:'Anastrozole',   dose:'0.25mg',    freq:'Twice weekly · Oral', cat:'Ancillary' },
-    { name:'Raloxifene',    dose:'60mg',      freq:'Daily · Oral', cat:'Ancillary' },
-    { name:'HCG',           dose:'500 IU',    freq:'Twice weekly · SC', cat:'Ancillary' },
-    // HRT
-    { name:'Oestradiol Patch',     dose:'50mcg',    freq:'Twice weekly', cat:'HRT' },
-    { name:'Oestradiol Gel',       dose:'1.5mg',    freq:'Daily · Topical', cat:'HRT' },
-    { name:'Utrogestan (Prog.)',   dose:'100mg',    freq:'Nightly · Oral', cat:'HRT' },
-    { name:'Tibolone',            dose:'2.5mg',    freq:'Daily · Oral', cat:'HRT' },
-    // Supplements
-    { name:'Vitamin D3/K2', dose:'5,000 IU / 100mcg', freq:'Daily · Oral', cat:'Supplement' },
-    { name:'Omega-3',       dose:'2g EPA/DHA',         freq:'Daily · Oral', cat:'Supplement' },
-    { name:'Zinc',          dose:'30mg',                freq:'Daily · Oral', cat:'Supplement' },
-    { name:'Magnesium Glycinate', dose:'400mg',         freq:'Nightly · Oral', cat:'Supplement' },
-    // Weight loss
-    { name:'Semaglutide',   dose:'0.25mg (starter)', freq:'Weekly · SC', cat:'Weight Loss' },
-    { name:'Tirzepatide',   dose:'2.5mg (starter)',  freq:'Weekly · SC', cat:'Weight Loss' },
-    { name:'Retatrutide',   dose:'2mg (starter)',    freq:'Weekly · SC', cat:'Weight Loss' },
-    // Sexual health
-    { name:'Tadalafil',     dose:'5mg',   freq:'Daily · Oral', cat:'Sexual Health' },
-    { name:'Sildenafil',    dose:'50mg',  freq:'As required · Oral', cat:'Sexual Health' },
-    // Longevity
-    { name:'NAD+ IV',       dose:'500mg', freq:'Monthly · IV infusion', cat:'Longevity' },
-    { name:'B12 Injection', dose:'1mg',   freq:'Weekly · IM', cat:'Longevity' },
-    { name:'BPC-157',       dose:'250mcg',freq:'Daily · SC', cat:'Peptide' },
-  ];
+  // ── MEDICATION LIBRARY ──
+  const MED_LIBRARY = {
+    trt: [
+      {name:'Testosterone Cypionate',dose:'100mg / 0.5ml',freq:'Mon & Thu · IM',route:'IM'},
+      {name:'Testosterone Enanthate',dose:'125mg / 0.5ml',freq:'Weekly · IM',route:'IM'},
+      {name:'Testosterone Gel',dose:'50mg / 5g',freq:'Daily · Topical',route:'Topical'},
+      {name:'Testosterone Undecanoate',dose:'1000mg / 4ml',freq:'Every 12 weeks · IM',route:'IM'},
+    ],
+    anc: [
+      {name:'Anastrozole',dose:'0.25mg',freq:'Twice weekly · Oral',route:'Oral'},
+      {name:'HCG',dose:'500 IU',freq:'Twice weekly · SC',route:'SC'},
+      {name:'Raloxifene',dose:'60mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Tamoxifen',dose:'20mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Clomiphene',dose:'25mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Cabergoline',dose:'0.25mg',freq:'Twice weekly · Oral',route:'Oral'},
+    ],
+    hrt: [
+      {name:'Oestradiol Patch',dose:'50mcg',freq:'Twice weekly',route:'Patch'},
+      {name:'Oestradiol Gel',dose:'1.5mg / 2 pumps',freq:'Daily · Topical',route:'Topical'},
+      {name:'Utrogestan',dose:'100mg',freq:'Nightly · Oral',route:'Oral'},
+      {name:'Tibolone',dose:'2.5mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Testosterone Cream (F)',dose:'5mg',freq:'Daily · Topical',route:'Topical'},
+      {name:'Vaginal Oestrogen',dose:'10mcg',freq:'Nightly × 2wks then x2/wk',route:'Local'},
+    ],
+    supp: [
+      {name:'Vitamin D3/K2',dose:'5,000 IU / 100mcg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Omega-3',dose:'2g EPA/DHA',freq:'Daily · Oral',route:'Oral'},
+      {name:'Zinc',dose:'30mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Magnesium Glycinate',dose:'400mg',freq:'Nightly · Oral',route:'Oral'},
+      {name:'B12 (Methylcobalamin)',dose:'1mg',freq:'Weekly · IM',route:'IM'},
+    ],
+    weight: [
+      {name:'Semaglutide',dose:'0.25mg (starter)',freq:'Weekly · SC',route:'SC'},
+      {name:'Tirzepatide',dose:'2.5mg (starter)',freq:'Weekly · SC',route:'SC'},
+      {name:'Retatrutide',dose:'2mg (starter)',freq:'Weekly · SC',route:'SC'},
+    ],
+    sex: [
+      {name:'Tadalafil',dose:'5mg',freq:'Daily · Oral',route:'Oral'},
+      {name:'Sildenafil',dose:'50mg',freq:'As required · Oral',route:'Oral'},
+      {name:'PT-141',dose:'1.75mg',freq:'As required · SC',route:'SC'},
+    ],
+    long: [
+      {name:'NAD+ IV',dose:'500mg',freq:'Monthly · IV',route:'IV'},
+      {name:'BPC-157',dose:'250mcg',freq:'Daily · SC',route:'SC'},
+      {name:'Sermorelin',dose:'300mcg',freq:'Nightly · SC',route:'SC'},
+      {name:'Ipamorelin',dose:'200mcg',freq:'Nightly · SC',route:'SC'},
+    ],
+  };
 
-  // Render med tiles grouped by category
-  function renderMedTiles() {
-    const cats = [...new Set(MED_LIBRARY.map(m => m.cat))];
-    const wrap = document.getElementById('medTiles');
-    wrap.style.gridTemplateColumns = '1fr 1fr';
-    wrap.innerHTML = cats.map(cat => {
-      const meds = MED_LIBRARY.filter(m => m.cat === cat);
-      return '<div style="grid-column:span 2;font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--copper);margin-top:6px;margin-bottom:4px;">' + cat + '</div>' +
-        meds.map((m,i) =>
-          '<div class="med-tile" onclick="addMed(' + MED_LIBRARY.indexOf(m) + ')">' +
-          '<div class="med-tile-name">' + m.name + '</div>' +
-          '<div class="med-tile-dose">' + m.dose + '</div>' +
-          '<div class="med-tile-freq">' + m.freq + '</div>' +
-          '</div>'
-        ).join('');
-    }).join('');
-  }
+  // ── TEMPLATES ──
+  const TEMPLATES = {
+    'trt-starter':     ['Testosterone Cypionate','Vitamin D3/K2','Omega-3'],
+    'trt-full':        ['Testosterone Cypionate','HCG','Anastrozole','Vitamin D3/K2'],
+    'trt-performance': ['Testosterone Cypionate','HCG','Anastrozole','Vitamin D3/K2','Omega-3','Zinc'],
+    'hrt-phase1':      ['Oestradiol Patch','Utrogestan','Vitamin D3/K2'],
+    'hrt-full':        ['Oestradiol Patch','Utrogestan','Testosterone Cream (F)','Vitamin D3/K2'],
+    'weight-loss':     ['Semaglutide','Testosterone Cypionate','Vitamin D3/K2'],
+    'sexual-health':   ['Testosterone Cypionate','Tadalafil','Vitamin D3/K2'],
+    'longevity':       ['Testosterone Cypionate','NAD+ IV','B12 (Methylcobalamin)','Vitamin D3/K2'],
+    'blank':           [],
+  };
 
-  // Auth gate
+  // ── AUTH ──
   onAuthStateChanged(auth, async user => {
     if (!user) return window.location.href = 'admin-login.html';
     currentUser = user;
     document.getElementById('clinicianName').textContent = user.displayName || user.email;
-    renderMedTiles();
+    renderLibrary();
     await loadPatients();
   });
 
   window.handleSignOut = async () => { await signOut(auth); window.location.href = 'admin-login.html'; };
 
-  async function loadPatients() {
-    const snap = await getDocs(collection(db, 'patients'));
-    allPatients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const sel = document.getElementById('patientSelect');
-    sel.innerHTML = '<option value="">— Select a patient —</option>' +
-      allPatients.map(p => '<option value="' + p.id + '">' + (p.name||p.email) + '</option>').join('');
+  // ── RENDER LIBRARY ──
+  function renderLibrary() {
+    Object.entries(MED_LIBRARY).forEach(([cat, meds]) => {
+      const el = document.getElementById('lib-' + cat);
+      if (!el) return;
+      el.innerHTML = meds.map((m,i) => {
+        const idx = Object.values(MED_LIBRARY).flat().indexOf(m);
+        return `<div class="med-tile" id="tile-${cat}-${i}" onclick="toggleMed('${cat}',${i})">
+          <div class="mt-check">✓</div>
+          <div class="mt-name">${m.name}</div>
+          <div class="mt-dose">${m.dose}</div>
+          <div class="mt-freq">${m.freq}</div>
+        </div>`;
+      }).join('');
+    });
   }
 
+  // ── LOAD PATIENTS ──
+  async function loadPatients() {
+    const snap = await getDocs(collection(db, 'patients'));
+    allPatients = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const sel = document.getElementById('patientSelect');
+    sel.innerHTML = '<option value="">— Select a patient —</option>' +
+      allPatients.map(p => `<option value="${p.id}">${p.name || p.email}</option>`).join('');
+  }
+
+  // ── SELECT PATIENT ──
   window.selectPatient = async function() {
     const id = document.getElementById('patientSelect').value;
+    currentPatientId = id || null;
     if (!id) {
-      document.getElementById('patientInfo').style.display = 'none';
-      document.getElementById('builderCard').style.display = 'none';
-      document.getElementById('savedProtocols').innerHTML = '<div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:24px;">Select a patient to view their protocols.</div>';
+      document.getElementById('savedList').innerHTML = '<div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:16px;">Select a patient to view their protocols.</div>';
+      document.getElementById('labsSelect').innerHTML = '<option value="">No labs linked</option>';
       return;
     }
-    currentPatientId = id;
-    const p = allPatients.find(x => x.id === id);
-    document.getElementById('patientInfo').style.display = 'block';
-    document.getElementById('patientInfo').innerHTML =
-      '<strong style="color:var(--cream);">' + (p.name||'—') + '</strong> · ' + (p.email||'') +
-      (p.plan ? ' · <span style="color:var(--copper);">' + p.plan + ' Plan</span>' : ' · No plan');
-    document.getElementById('builderCard').style.display = 'block';
-    clearBuild();
+    await loadLabsForPatient(id);
     await loadSavedProtocols(id);
   };
 
-  // ── ADD MED FROM LIBRARY ──
-  window.addMed = function(idx) {
-    const m = MED_LIBRARY[idx];
-    buildItems.push({ name: m.name, dose: m.dose, freq: m.freq });
+  async function loadLabsForPatient(uid) {
+    const sel = document.getElementById('labsSelect');
+    try {
+      const snap = await getDocs(query(collection(db, 'patients', uid, 'labs'), orderBy('uploadedAt','desc')));
+      const labs = snap.docs.map(d => ({id:d.id,...d.data()}));
+      sel.innerHTML = '<option value="">No labs linked</option>' +
+        labs.map(l => {
+          const date = l.uploadedAt?.toDate ? l.uploadedAt.toDate().toLocaleDateString('en-GB') : (l.test_date||'—');
+          return `<option value="${l.id}">${date} · ${l.lab_name||'Blood Panel'}</option>`;
+        }).join('');
+    } catch(e) { sel.innerHTML = '<option value="">No labs available</option>'; }
+  }
+
+  // ── TEMPLATE ──
+  window.applyTemplate = function(key) {
+    document.querySelectorAll('.template-tile').forEach(t => t.style.borderColor = '');
+    event.currentTarget.style.borderColor = 'var(--copper)';
+    const names = TEMPLATES[key] || [];
+    buildItems = [];
+    // reset all tiles
+    document.querySelectorAll('.med-tile').forEach(t => t.classList.remove('in-proto'));
+    const allMeds = Object.values(MED_LIBRARY).flat();
+    names.forEach(name => {
+      const m = allMeds.find(x => x.name === name);
+      if (m) {
+        buildItems.push({...m, startDate: new Date().toLocaleDateString('en-GB'), previousDose: null, reason: ''});
+        // mark tile
+        Object.entries(MED_LIBRARY).forEach(([cat, meds]) => {
+          meds.forEach((med, i) => {
+            if (med.name === name) {
+              const tile = document.getElementById(`tile-${cat}-${i}`);
+              if (tile) tile.classList.add('in-proto');
+            }
+          });
+        });
+      }
+    });
+    if (!document.getElementById('protoName').value) {
+      const names_map = {'trt-starter':'TRT Starter','trt-full':'TRT + Ancillaries','trt-performance':'TRT Performance','hrt-phase1':'HRT Phase 1','hrt-full':'Menopause Full Protocol','weight-loss':'GLP-1 + TRT','sexual-health':'ED + TRT Protocol','longevity':'Longevity Stack','blank':'Custom Protocol'};
+      document.getElementById('protoName').value = (names_map[key]||'') + ' — ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    }
     renderBuild();
   };
 
+  // ── TOGGLE MED ──
+  window.toggleMed = function(cat, idx) {
+    const m = MED_LIBRARY[cat][idx];
+    const tile = document.getElementById(`tile-${cat}-${idx}`);
+    const existing = buildItems.findIndex(x => x.name === m.name);
+    if (existing >= 0) {
+      buildItems.splice(existing, 1);
+      tile.classList.remove('in-proto');
+    } else {
+      buildItems.push({...m, startDate: new Date().toLocaleDateString('en-GB'), previousDose: null, reason: ''});
+      tile.classList.add('in-proto');
+    }
+    renderBuild();
+  };
+
+  // ── ADD CUSTOM ──
   window.addCustom = function() {
     const name = document.getElementById('custName').value.trim();
     const dose = document.getElementById('custDose').value.trim();
     const freq = document.getElementById('custFreq').value.trim();
     if (!name) return;
-    buildItems.push({ name, dose: dose||'—', freq: freq||'—' });
+    buildItems.push({name, dose:dose||'—', freq:freq||'—', route:'Oral', startDate: new Date().toLocaleDateString('en-GB'), previousDose: null, reason: '', custom: true});
     document.getElementById('custName').value = '';
     document.getElementById('custDose').value = '';
     document.getElementById('custFreq').value = '';
     renderBuild();
   };
 
-  window.removeMed = function(i) {
+  // ── RENDER BUILD ──
+  function renderBuild() {
+    const container = document.getElementById('protoItems');
+    const empty = document.getElementById('emptyMsg');
+    const rName = document.getElementById('rightProtoName');
+    const rStatus = document.getElementById('rightStatus');
+    const status = document.getElementById('protoStatus').value;
+
+    rName.textContent = document.getElementById('protoName').value || 'New Protocol';
+    rStatus.className = 'status-badge status-' + status;
+    rStatus.textContent = {active:'Active',paused:'Paused',pending:'Pending Bloods',completed:'Completed'}[status]||'Active';
+
+    if (!buildItems.length) {
+      empty.style.display = 'block';
+      container.innerHTML = '';
+      container.appendChild(empty);
+      return;
+    }
+    empty.style.display = 'none';
+
+    container.innerHTML = buildItems.map((m,i) => `
+      <div class="proto-item">
+        <button class="pi-remove" onclick="removeItem(${i})">✕</button>
+        <div class="pi-name">${m.name}</div>
+        <div class="pi-fields">
+          <div class="pi-field"><label>Dose</label><input value="${m.dose}" onchange="buildItems[${i}].dose=this.value"></div>
+          <div class="pi-field"><label>Route</label><input value="${m.route||'—'}" onchange="buildItems[${i}].route=this.value"></div>
+          <div class="pi-field"><label>Frequency</label><input value="${m.freq}" onchange="buildItems[${i}].freq=this.value"></div>
+        </div>
+        ${m.previousDose ? `<div class="pi-history"><span class="dose-old">${m.previousDose}</span><span style="color:var(--dim);font-size:0.6rem;">→</span><span class="dose-new">${m.dose}</span><span class="dose-reason">${m.reason||''}</span></div>` : `<div class="pi-history">Started ${m.startDate}</div>`}
+      </div>`).join('');
+  }
+
+  window.removeItem = function(i) {
+    const m = buildItems[i];
+    // unmark tile
+    Object.entries(MED_LIBRARY).forEach(([cat, meds]) => {
+      meds.forEach((med, idx) => {
+        if (med.name === m.name) {
+          const tile = document.getElementById(`tile-${cat}-${idx}`);
+          if (tile) tile.classList.remove('in-proto');
+        }
+      });
+    });
     buildItems.splice(i, 1);
     renderBuild();
   };
 
-  function renderBuild() {
-    const list = document.getElementById('protoList');
-    if (!buildItems.length) {
-      list.innerHTML = '<div class="proto-empty">No medications added yet.</div>';
-      return;
-    }
-    list.innerHTML = buildItems.map((m,i) =>
-      '<div class="proto-item">' +
-      '<div style="flex:1">' +
-        '<div class="proto-item-name">' + m.name + '</div>' +
-        '<div class="proto-item-dose">' + m.dose + '</div>' +
-      '</div>' +
-      '<div class="proto-item-freq">' + m.freq + '</div>' +
-      '<button class="proto-item-remove" onclick="removeMed(' + i + ')">✕</button>' +
-      '</div>'
-    ).join('');
-  }
-
   window.clearBuild = function() {
     buildItems = [];
     document.getElementById('protoName').value = '';
+    document.getElementById('clinicianNotes').value = '';
+    document.querySelectorAll('.med-tile').forEach(t => t.classList.remove('in-proto'));
+    document.querySelectorAll('.template-tile').forEach(t => t.style.borderColor = '');
     renderBuild();
-    document.getElementById('saveStatus').style.display = 'none';
+    showStatus('','');
   };
 
   // ── SAVE PROTOCOL ──
   window.saveProtocol = async function() {
-    if (!currentPatientId) return;
-    const name = document.getElementById('protoName').value.trim() || 'Protocol';
-    if (!buildItems.length) return showSaveStatus('err', 'Add at least one medication first.');
+    if (!currentPatientId) return showStatus('err', 'Select a patient first.');
+    const name = document.getElementById('protoName').value.trim();
+    if (!name) return showStatus('err', 'Give this protocol a name.');
+    if (!buildItems.length) return showStatus('err', 'Add at least one medication.');
 
     document.getElementById('saveBtn').disabled = true;
     try {
+      const linkedLabId = document.getElementById('labsSelect').value || null;
       await addDoc(collection(db, 'patients', currentPatientId, 'protocols'), {
         name,
+        status: document.getElementById('protoStatus').value,
         medications: buildItems,
+        notes: document.getElementById('clinicianNotes').value,
+        linkedLabId,
         createdBy: currentUser.email,
         createdAt: serverTimestamp(),
-        active: true,
+        updatedAt: serverTimestamp(),
       });
-      showSaveStatus('ok', '✓ Protocol "' + name + '" saved to patient dashboard.');
-      clearBuild();
+      showStatus('ok', `✓ Protocol "${name}" saved. Visible in patient dashboard immediately.`);
       await loadSavedProtocols(currentPatientId);
     } catch(e) {
-      showSaveStatus('err', 'Save failed: ' + e.message);
+      showStatus('err', 'Save failed: ' + e.message);
     }
     document.getElementById('saveBtn').disabled = false;
   };
 
-  function showSaveStatus(type, msg) {
-    const el = document.getElementById('saveStatus');
-    el.style.display = 'flex';
-    el.className = 'status status-' + type;
+  // ── LOAD SAVED ──
+  async function loadSavedProtocols(uid) {
+    const list = document.getElementById('savedList');
+    try {
+      const snap = await getDocs(collection(db, 'patients', uid, 'protocols'));
+      const protos = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      if (!protos.length) {
+        list.innerHTML = '<div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:16px;border:1px dashed var(--line);border-radius:2px;">No protocols saved yet for this patient.</div>';
+        return;
+      }
+      const statusMap = {active:'status-active',paused:'status-paused',pending:'status-pending',completed:'status-completed'};
+      const statusLabel = {active:'Active',paused:'Paused',pending:'Pending Bloods',completed:'Completed'};
+      list.innerHTML = protos.map(p => {
+        const date = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleDateString('en-GB') : '—';
+        const meds = (p.medications||[]).map(m => `<span class="si-med">${m.name}</span>`).join('');
+        return `<div class="saved-item">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <div class="si-name">${p.name}</div>
+            <span class="status-badge ${statusMap[p.status]||'status-active'}">${statusLabel[p.status]||'Active'}</span>
+          </div>
+          <div class="si-meta">${date} · ${p.createdBy||''}</div>
+          <div class="si-meds" style="margin-top:6px;">${meds}</div>
+          <button onclick="deleteProto('${uid}','${p.id}')" style="margin-top:8px;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:none;color:rgba(251,243,218,0.2);cursor:pointer;padding:0;" onmouseover="this.style.color='#e03535'" onmouseout="this.style.color='rgba(251,243,218,0.2)'">Delete</button>
+        </div>`;
+      }).join('');
+    } catch(e) { list.innerHTML = '<div style="font-size:0.68rem;color:#e05555;padding:12px;">Error loading protocols.</div>'; }
+  }
+
+  window.deleteProto = async function(uid, pid) {
+    if (!confirm('Delete this protocol?')) return;
+    await deleteDoc(doc(db, 'patients', uid, 'protocols', pid));
+    await loadSavedProtocols(uid);
+  };
+
+  // ── STATUS + SYNC ──
+  function showStatus(type, msg) {
+    const el = document.getElementById('statusBar');
+    if (!type) { el.classList.remove('show'); return; }
+    el.className = 'status-bar show sb-' + type;
     el.textContent = msg;
   }
 
-  // ── LOAD SAVED PROTOCOLS ──
-  async function loadSavedProtocols(patientId) {
-    const wrap = document.getElementById('savedProtocols');
-    wrap.innerHTML = '<div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:16px;">Loading…</div>';
-    try {
-      const snap = await getDocs(collection(db, 'patients', patientId, 'protocols'));
-      const protos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (!protos.length) {
-        wrap.innerHTML = '<div style="font-size:0.68rem;color:var(--dim);text-align:center;padding:24px;border:1px dashed var(--line);border-radius:2px;">No protocols saved yet for this patient.</div>';
-        return;
-      }
-      wrap.innerHTML = protos.map(pr => {
-        const date = pr.createdAt?.toDate ? pr.createdAt.toDate().toLocaleDateString('en-GB') : '—';
-        const meds = (pr.medications||[]).map(m => '<span class="saved-proto-med">' + m.name + '</span>').join('');
-        return '<div class="saved-proto">' +
-          '<div class="saved-proto-head">' +
-            '<div>' +
-              '<div class="saved-proto-name">' + pr.name + '</div>' +
-              '<div class="saved-proto-meta">' + date + ' · ' + (pr.createdBy||'') + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="saved-proto-meds">' + meds + '</div>' +
-          '<div class="saved-proto-actions">' +
-            '<button class="btn-sm danger" onclick="deleteProto(\'' + patientId + '\',\'' + pr.id + '\')">Delete</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    } catch(e) {
-      wrap.innerHTML = '<div style="font-size:0.68rem;color:#e05555;padding:12px;">Error loading protocols: ' + e.message + '</div>';
-    }
-  }
-
-  window.deleteProto = async function(patientId, protoId) {
-    if (!confirm('Delete this protocol? This cannot be undone.')) return;
-    try {
-      await deleteDoc(doc(db, 'patients', patientId, 'protocols', protoId));
-      await loadSavedProtocols(patientId);
-    } catch(e) { alert('Delete failed: ' + e.message); }
-  };
+  document.getElementById('protoName').addEventListener('input', renderBuild);
+  document.getElementById('protoStatus').addEventListener('change', renderBuild);
 </script>
 </body>
 </html>
