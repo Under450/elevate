@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIVE — The Inner Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#111d2b;--navy2:#0d1520;--cream:#fbf3da;--copper:#b87333;--tan:#bd9468;--dim:rgba(251,243,218,0.45);--line:rgba(184,115,51,0.22);--sidebar:240px;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--navy);color:var(--cream);font-family:'Didact Gothic',sans-serif;min-height:100%;}
+
+  /* SIDEBAR */
+  aside{width:var(--sidebar);min-height:100vh;background:#0a1018;border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:0 0 32px;}
+  .sb-brand{padding:28px 24px;border-bottom:1px solid var(--line);}
+  .sb-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;letter-spacing:0.3em;color:var(--copper);text-transform:uppercase;text-decoration:none;display:block;}
+  .sb-tag{font-size:0.52rem;letter-spacing:0.3em;color:var(--dim);text-transform:uppercase;margin-top:4px;}
+  .sb-section{font-size:0.48rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);padding:20px 24px 6px;opacity:0.7;}
+  nav a{display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:0.72rem;color:var(--dim);text-decoration:none;letter-spacing:0.08em;transition:all 0.2s;position:relative;}
+  nav a:hover{color:var(--cream);background:rgba(184,115,51,0.06);}
+  nav a.active{color:var(--cream);background:rgba(184,115,51,0.1);}
+  nav a.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--copper);}
+  .sb-user{margin-top:auto;padding:20px 24px;border-top:1px solid var(--line);}
+  .sb-user-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--cream);margin-bottom:2px;}
+  .sb-user-plan{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);}
+  .btn-signout{margin-top:8px;font-size:0.58rem;color:var(--dim);background:none;border:none;cursor:pointer;letter-spacing:0.1em;padding:0;}
+  .btn-signout:hover{color:var(--cream);}
+
+  /* MAIN */
+  main{margin-left:var(--sidebar);padding:48px 48px 80px;}
+
+  /* HERO */
+  .hero{margin-bottom:48px;}
+  .hero-eyebrow{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;color:var(--cream);margin-bottom:10px;}
+  .hero-sub{font-size:0.75rem;color:var(--dim);line-height:1.7;letter-spacing:0.05em;}
+
+  /* HUB GRID */
+  .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:48px;}
+  .hub-card{background:rgba(22,32,48,0.6);border:1px solid var(--line);border-radius:2px;padding:32px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:all 0.25s;text-decoration:none;}
+  .hub-card:hover{border-color:var(--copper);background:rgba(184,115,51,0.06);transform:translateY(-2px);}
+  .hub-icon{font-size:1.8rem;margin-bottom:4px;}
+  .hub-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--cream);}
+  .hub-desc{font-size:0.7rem;color:var(--dim);line-height:1.7;}
+  .hub-cta{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--copper);margin-top:4px;}
+
+  /* PODCAST SECTION */
+  .section-label{font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--copper);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  .podcast-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .podcast-card{background:rgba(17,29,43,0.8);border:1px solid var(--line);border-radius:2px;padding:22px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color 0.2s;}
+  .podcast-card:hover{border-color:var(--copper);}
+  .pc-cat{font-size:0.5rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--copper);}
+  .pc-title{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:400;color:var(--cream);line-height:1.3;}
+  .pc-meta{font-size:0.6rem;color:var(--dim);letter-spacing:0.08em;}
+  .pc-preview{font-size:0.68rem;color:var(--dim);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pc-read{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--copper);}
+  .empty-state{grid-column:span 3;text-align:center;padding:60px;color:var(--dim);font-size:0.75rem;letter-spacing:0.1em;border:1px dashed var(--line);border-radius:2px;}
+
+  /* PODCAST MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#0d1520;border:1px solid var(--line);border-radius:2px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:40px;display:flex;flex-direction:column;gap:20px;}
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--cream);line-height:1.3;}
+  .modal-close{background:none;border:none;color:var(--dim);font-size:1.3rem;cursor:pointer;flex-shrink:0;padding:4px;}
+  .modal-close:hover{color:var(--cream);}
+  .modal-meta{font-size:0.62rem;color:var(--dim);letter-spacing:0.1em;}
+  .modal-script{font-size:0.78rem;line-height:1.9;color:var(--dim);white-space:pre-wrap;}
+  .copper-line{height:1px;background:linear-gradient(90deg,transparent,var(--copper),transparent);opacity:0.2;}
+
+  @media(max-width:900px){
+    :root{--sidebar:0px;}
+    main{margin-left:0;padding:24px 16px 60px;}
+    .hub-grid{grid-template-columns:1fr;}
+    .podcast-grid{grid-template-columns:1fr;}
+    .empty-state{grid-column:span 1;}
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="sb-brand">
+    <a href="dashboard.html" class="sb-logo">Revive</a>
+    <div class="sb-tag">Hormone Optimisation</div>
+  </div>
+  <div class="sb-section">Patient</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="assessment.html">My Assessment</a>
+    <a href="#">My Protocol</a>
+    <a href="https://under450.github.io/elevate/trt-calendar.html">Injection Tracker</a>
+    <a href="inner-circle.html" class="active">Inner Circle</a>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-user-name" id="userName">—</div>
+    <div class="sb-user-plan" id="userPlan">Patient</div>
+    <button class="btn-signout" onclick="handleSignOut()">Sign out →</button>
+  </div>
+</aside>
+
+<main>
+  <div class="hero">
+    <div class="hero-eyebrow">The Inner Circle</div>
+    <h1 class="hero-title">Welcome to the Inner Circle, <span id="firstName">—</span></h1>
+    <p class="hero-sub">Members-only research podcasts, clinician AMAs, and private community.</p>
+  </div>
+
+  <div class="hub-grid">
+    <a class="hub-card" onclick="document.getElementById('podcastSection').scrollIntoView({behavior:'smooth'})">
+      <div class="hub-icon">🎧</div>
+      <div class="hub-title">Research Podcasts</div>
+      <div class="hub-desc">Doctor-reviewed audio summaries of peer-reviewed TRT and HRT studies.</div>
+      <div class="hub-cta">Browse Library →</div>
+    </a>
+    <a class="hub-card" href="#">
+      <div class="hub-icon">🩺</div>
+      <div class="hub-title">Clinician AMAs</div>
+      <div class="hub-desc">Monthly live Q&As with your clinician and guest specialists.</div>
+      <div class="hub-cta">View Upcoming →</div>
+    </a>
+    <a class="hub-card" href="#">
+      <div class="hub-icon">💬</div>
+      <div class="hub-title">Community Forum</div>
+      <div class="hub-desc">Private discussions with other patients on protocol. Share experiences, ask questions.</div>
+      <div class="hub-cta">Enter Forum →</div>
+    </a>
+    <a class="hub-card" href="#">
+      <div class="hub-icon">📅</div>
+      <div class="hub-title">Events &amp; Retreats</div>
+      <div class="hub-desc">Quarterly retreats, member meetups, and optimisation events.</div>
+      <div class="hub-cta">See Calendar →</div>
+    </a>
+  </div>
+
+  <div id="podcastSection">
+    <div class="section-label">Research Podcasts</div>
+    <div class="podcast-grid" id="podcastGrid">
+      <div class="empty-state">Loading episodes…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Podcast Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-meta" id="modalMeta"></div>
+    <div class="copper-line"></div>
+    <div class="modal-script" id="modalScript"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:"AIzaSyBKufRSWf3oS4wA0UIlJE8kr0yrQClWzuY",
+    authDomain:"revive-clinic-885e7.firebaseapp.com",
+    projectId:"revive-clinic-885e7",
+    storageBucket:"revive-clinic-885e7.firebasestorage.app",
+    messagingSenderId:"1075531492371",
+    appId:"1:1075531492371:web:64ef54b11f47401be063e6"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) return window.location.href = 'login.html';
+    const name = (user.displayName || user.email || '').split(' ')[0];
+    document.getElementById('firstName').textContent = name;
+    document.getElementById('userName').textContent  = user.displayName || user.email;
+  });
+
+  window.handleSignOut = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+  // Load podcasts
+  const cats = {trt:'TRT',hrt:'HRT',longevity:'Longevity','sexual-health':'Sexual Health','weight-loss':'Weight Loss',nutrition:'Nutrition',general:'General'};
+
+  async function loadPodcasts() {
+    const grid = document.getElementById('podcastGrid');
+    try {
+      const snap = await getDocs(query(collection(db, 'podcasts'), where('status','==','published')));
+      const pods = snap.docs.map(d => ({id:d.id,...d.data()}));
+      window._podcasts = pods;
+
+      if (!pods.length) {
+        grid.innerHTML = '<div class="empty-state">No episodes published yet. Check back soon — new research podcasts are added regularly.</div>';
+        return;
+      }
+
+      grid.innerHTML = pods.map(p => {
+        const date    = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') : '—';
+        const cat     = cats[p.category] || p.category || 'Research';
+        const preview = (p.script || '').substring(0, 220) + '…';
+        return '<div class="podcast-card" onclick="openPodcast(\'' + p.id + '\')">' +
+          '<div class="pc-cat">' + cat + '</div>' +
+          '<div class="pc-title">' + p.title + '</div>' +
+          '<div class="pc-meta">Published ' + date + '</div>' +
+          '<div class="pc-preview">' + preview + '</div>' +
+          '<div class="pc-read">Read Episode →</div>' +
+          '</div>';
+      }).join('');
+    } catch(e) {
+      grid.innerHTML = '<div class="empty-state">Could not load episodes. Please try again.</div>';
+      console.error(e);
+    }
+  }
+
+  loadPodcasts();
+
+  window.openPodcast = function(id) {
+    const p = (window._podcasts || []).find(x => x.id === id);
+    if (!p) return;
+    const date = p.publishedAt?.toDate ? p.publishedAt.toDate().toLocaleDateString('en-GB') : '—';
+    document.getElementById('modalTitle').textContent  = p.title;
+    document.getElementById('modalMeta').textContent   = (cats[p.category]||'Research') + ' · Published ' + date + (p.source ? ' · Source: ' + p.source : '');
+    document.getElementById('modalScript').textContent = p.script || '';
+    document.getElementById('modalOverlay').classList.add('open');
+  };
+
+  window.closeModal = () => document.getElementById('modalOverlay').classList.remove('open');
+</script>
+</body>
+</html>
